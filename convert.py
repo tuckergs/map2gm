@@ -13,7 +13,7 @@ with open(rmj_filename) as f:
 for i, ent in enumerate(entities):
     entities[i] = (ent[0], ent[1], name_to_rmj[ent[2]])
 
-formatstring = '    <instance objName="%s" x="%s" y="%s" name="inst_%s" locked="0" code="" scaleX="1" scaleY="1" colour="4294967295" rotation="0"/>'
+formatstring = '    <instance objName="%s" x="%s" y="%s" name="inst_%s" locked="0" code="" scaleX="1" scaleY="1" colour="4294967295" rotation="0"/>\n'
 
 template_filename = 'rTemplate.room.gmx'
 output_filename = 'gm/gm/rooms/rOutput.room.gmx'
@@ -21,6 +21,15 @@ output_filename = 'gm/gm/rooms/rOutput.room.gmx'
 f = open(template_filename, 'r')
 contents = f.readlines()
 f.close()
+
+try:
+    index = contents.index('  <instances/>\n')
+    contents[index] = '  <instances>\n'
+    contents.insert(index + 1, '  </instances>\n')
+except ValueError:
+    index = contents.index('  <instances>\n') + 1
+
+print(index)
 
 for i, ent in enumerate(entities):
     subbed = formatstring % (ent[2], ent[0], ent[1], hex(i)[2:].upper().zfill(8))
