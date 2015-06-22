@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
+import convert
 
 def ask_path(entry):
     path = filedialog.askopenfilename()
@@ -11,9 +12,11 @@ def ask_path(entry):
 def button_go():
     rmj = entry_rmj.get()
     roomname = entry_roomname.get()
-    project = entry_project.get()
     template = entry_template.get()
-    print(rmj, roomname, project, template)
+    project = entry_project.get()
+    entities = convert.get_entities_from_rmj(rmj)
+    convert.write_room(entities, roomname, template)
+    convert.add_room_to_project(roomname, project)
     
 def row_askpath(labeltext):
     global row
