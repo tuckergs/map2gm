@@ -12,8 +12,7 @@ def write_lines(filename, lines):
     with open(filename, 'w') as f:
         f.write(''.join(lines))
 
-def get_entities_from_rmj(rmj_filename):
-    rmj_to_gm = {'12':'spikeUp','9':'spikeDown','11':'spikeRight','10':'spikeLeft','2':'block','32':'save','3':'start','20':'end'}
+def get_entities_from_rmj(rmj_filename, rmj_to_gm):
     with open(rmj_filename) as f:
         line = f.readlines()[3]
         entities = list(group(line[1:].split(' '), 3))

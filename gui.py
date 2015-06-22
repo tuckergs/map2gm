@@ -30,7 +30,11 @@ def button_go():
         messagebox.showinfo('', 'Room with that name currently exists. This tool won\'t overwrite it; delete the room manually if you\'re sure.')
         return
     try:
-        entities = convert.get_entities_from_rmj(rmj)
+        #','3':'start','20':'end'}
+        rmj_to_gm = {}
+        for key, val in object_entries.items():
+            rmj_to_gm[key] = val.get()
+        entities = convert.get_entities_from_rmj(rmj, rmj_to_gm)
         convert.write_room(entities, roomname, project, template)
         convert.add_room_to_project(roomname, project)
     except:
@@ -54,16 +58,80 @@ def row_entry(labeltext):
     entry.grid(row=1,column=1)
     row += 1
     return entry
+def row_object_old(rmj_id, image_filename):
+    global row
+    photo = tk.PhotoImage(file=image_filename)
+    w = tk.Label(root,image=photo)
+    w.photo = photo # to prevent it from being garbage collected?
+    w.grid(row=row,column=0)
+    object_entries[rmj_id] = tk.Entry(root)
+    object_entries[rmj_id].grid(row=row,column=1)
+    row += 1
+def row_object(rmj_id, image_filename):
+    global objectrow
+    photo = tk.PhotoImage(file=image_filename)
+    w = tk.Label(root,image=photo)
+    w.photo = photo # to prevent it from being garbage collected?
+    canvas.create_window((0,0+objectrow*objectrowheight),anchor=tk.W,window=w)
+    e = tk.Entry(root)
+    canvas.create_window((50,0+objectrow*objectrowheight),anchor=tk.W,window=e)
+    c = tk.Checkbutton(root,text="Enabled")
+    canvas.create_window((200,0+objectrow*objectrowheight),anchor=tk.W,window=c)
+    object_entries[rmj_id] = e
+    objectrow += 1
+
+
+object_images = [('2','images/temp.gif'),#block
+                 ('12','images/temp.gif'),#spike up right left down
+                 ('11','images/temp.gif'),
+                 ('10','images/temp.gif'),
+                 ('9','images/temp.gif'),
+                 ('19','images/temp.gif'),#mini spike up right left down
+                 ('18','images/temp.gif'),
+                 ('17','images/temp.gif'),
+                 ('16','images/temp.gif'),
+                 ('32','images/temp.gif'),#save
+                 ('31','images/temp.gif'),#movingPlatform
+                 ('23','images/temp.gif'),#water1
+                 ('30','images/temp.gif'),#water2
+                 ('20','images/temp.gif'),#apple
+                 ('27','images/temp.gif'),#hurt block
+                 ('28','images/temp.gif'),#ivy right
+                 ('29','images/temp.gif'),#ivy left
+                 ]
+
+objectrowheight = 40
+frameheight = 3 * objectrowheight
+canvasheight = (len(object_images) - 1) * objectrowheight
 
 row = 0
 root = tk.Tk()
 root.wm_title('RMJ to GM:S converter')
 root.resizable(0,0)
 
+object_entries = {}
+
 entry_rmj = row_askpath('RMJ file:')
 entry_roomname = row_entry('Room name:')
 entry_template = row_askpath('Room template:')
 entry_project = row_askpath('Project file:')
+
+frame = tk.Frame(root,height=frameheight,relief=tk.GROOVE,borderwidth=2)
+frame.grid(row=row,column=0,columnspan=3,padx=5,pady=5)
+canvas = tk.Canvas(frame,height=600,scrollregion=(0,0,0,canvasheight),yscrollincrement=objectrowheight)
+row += 1
+objectrow = 0
+
+for rmj_id, imagepath in object_images:
+    row_object(rmj_id, imagepath)
+
+vbar=tk.Scrollbar(frame,orient=tk.VERTICAL)
+vbar.pack(side=tk.RIGHT,fill=tk.Y)
+vbar.config(command=canvas.yview)
+canvas.config(height=frameheight)
+canvas.config(yscrollcommand=vbar.set)
+canvas.pack(side=tk.LEFT,expand=True,fill=tk.BOTH,pady=20)
+
 tk.Button(root,text='Convert',command=button_go).grid(row=row,column=1)
 
 if os.path.exists('prefs'):
