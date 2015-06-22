@@ -1,3 +1,5 @@
+import os
+
 def group(lst, n):
     for i in range(0, len(lst), n):
         val = lst[i:i+n]
@@ -19,8 +21,9 @@ def get_entities_from_rmj(rmj_filename):
         ent[2] = rmj_to_gm[ent[2]]
     return entities
 
-def write_room(entities, room_name, template_filename):
-    output_filename = 'gm/rooms/%s.room.gmx' % room_name
+def write_room(entities, room_name, project_filename, template_filename):
+    output_filename = os.path.join(os.path.split(project_filename)[0], 'rooms', '%s.room.gmx' % room_name)
+    print(output_filename)
     lines = read_lines(template_filename)
     try:
         i = lines.index('  <instances/>\n')
