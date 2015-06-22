@@ -23,7 +23,6 @@ def get_entities_from_rmj(rmj_filename):
 
 def write_room(entities, room_name, project_filename, template_filename):
     output_filename = os.path.join(os.path.split(project_filename)[0], 'rooms', '%s.room.gmx' % room_name)
-    print(output_filename)
     lines = read_lines(template_filename)
     try:
         i = lines.index('  <instances/>\n')

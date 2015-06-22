@@ -20,6 +20,11 @@ def button_go():
     if rmj == '' or roomname == '' or template == '' or project == '':
         messagebox.showinfo('', 'Cant have empty fields.')
         return
+
+    with open('prefs', 'w') as f:
+        f.write('template|%s\n' % template)
+        f.write('project|%s\n' % project)
+
     fn = os.path.join(os.path.split(project)[0], 'rooms', roomname + '.room.gmx')
     if os.path.exists(fn):
         messagebox.showinfo('', 'Room with that name currently exists. This tool won\'t overwrite it; delete the room manually if you\'re sure.')
@@ -60,5 +65,16 @@ entry_roomname = row_entry('Room name:')
 entry_template = row_askpath('Room template:')
 entry_project = row_askpath('Project file:')
 tk.Button(root,text='Convert',command=button_go).grid(row=row,column=1)
+
+if os.path.exists('prefs'):
+    with open('prefs', 'r') as f:
+        for line in f:
+            type, value = line[:-1].split('|')
+            if type == 'template':
+                entry_template.insert(0, value)
+                entry_template.xview(tk.END)
+            elif type == 'project':
+                entry_project.insert(0, value)
+                entry_project.xview(tk.END)
 
 root.mainloop()
