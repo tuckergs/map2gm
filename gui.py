@@ -20,8 +20,11 @@ def button_go():
     rmj_to_gm = {}
     emptyObject = False
     for key, val in object_entries.items():
-        rmj_to_gm[key] = val.get()
-        if val.get() == '':
+        text = val[0].get()
+        enabled = val[1].get()
+        if enabled:
+            rmj_to_gm[key] = text
+        if text == '' and enabled:
             emptyObject = True
 
     if rmj == '' or roomname == '' or template == '' or project == '' or emptyObject:
@@ -32,7 +35,7 @@ def button_go():
         f.write('template|%s\n' % template)
         f.write('project|%s\n' % project)
         for key, value in object_entries.items():
-            f.write('%s|%s\n' % (key, value.get()))
+            f.write('%s|%s|%s\n' % (key, value[0].get(), value[1].get()))
 
     fn = os.path.join(os.path.split(project)[0], 'rooms', roomname + '.room.gmx')
     if os.path.exists(fn):
@@ -42,13 +45,13 @@ def button_go():
         entities = convert.get_entities_from_rmj(rmj, rmj_to_gm)
         convert.write_room(entities, roomname, project, template)
         convert.add_room_to_project(roomname, project)
+        messagebox.showinfo('', 'Successfully converted! Prefs saved.')
     except:
         info = sys.exc_info()
         with open('errorlog.txt', 'w') as f:
             f.write('Last error:\n\n%s\n%s\n%s' % info)
         #todo: print stack trace
         messagebox.showinfo('', 'There was an error when converting. Exception logged in errorlog.txt.\nLikely reasons: File at a path doesn\'t exist, File is the wrong type or is malformed, Don\'t have permissions to modify file. Hopefully it\'s not a bug in the program.')
-    messagebox.showinfo('', 'Successfully converted! Prefs saved.')
     
 def row_askpath(labeltext, title, filetypes):
     global row
@@ -65,15 +68,12 @@ def row_entry(labeltext):
     entry.grid(row=1,column=1,sticky=tk.EW)
     row += 1
     return entry
-def row_object_old(rmj_id, image_filename):
-    global row
-    photo = tk.PhotoImage(file=image_filename)
-    w = tk.Label(root,image=photo)
-    w.photo = photo # to prevent it from being garbage collected?
-    w.grid(row=row,column=0)
-    object_entries[rmj_id] = tk.Entry(root)
-    object_entries[rmj_id].grid(row=row,column=1)
-    row += 1
+def check_clicked(rmj_id):
+    val = object_entries[rmj_id][1].get()
+    if val == 1:
+        object_entries[rmj_id][0].configure(state='normal')
+    else:
+        object_entries[rmj_id][0].configure(state='disabled')
 def row_object(rmj_id, image_filename):
     global objectrow
     photo = tk.PhotoImage(file=image_filename)
@@ -82,9 +82,10 @@ def row_object(rmj_id, image_filename):
     canvas.create_window((0,0+objectrow*objectrowheight),anchor=tk.W,window=w)
     e = tk.Entry(root)
     canvas.create_window((50,0+objectrow*objectrowheight),anchor=tk.W,window=e)
-    c = tk.Checkbutton(root,text="Enabled")
+    v = tk.IntVar()
+    c = tk.Checkbutton(root,text="Enabled",variable=v,command=lambda: check_clicked(rmj_id))
     canvas.create_window((200,0+objectrow*objectrowheight),anchor=tk.W,window=c)
-    object_entries[rmj_id] = e
+    object_entries[rmj_id] = (e, v)
     objectrow += 1
 
 
@@ -147,7 +148,9 @@ root.grid_columnconfigure(2, weight=1)
 if os.path.exists('prefs'):
     with open('prefs', 'r') as f:
         for line in f:
-            type, value = line[:-1].split('|')
+            args = line[:-1].split('|')
+            args += [''] * (3 - len(args))
+            type, value, arg3 = args
             if type == 'template':
                 entry_template.insert(0, value)
                 entry_template.xview(tk.END)
@@ -155,6 +158,11 @@ if os.path.exists('prefs'):
                 entry_project.insert(0, value)
                 entry_project.xview(tk.END)
             else:
-                object_entries[type].insert(0, value)
+                object_entries[type][0].insert(0, value)
+                object_entries[type][1].set(int(arg3))
+                if int(arg3) == 1:
+                    object_entries[type][0].configure(state='normal')
+                else:
+                    object_entries[type][0].configure(state='disabled')
 
 root.mainloop()
