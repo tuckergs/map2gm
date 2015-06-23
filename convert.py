@@ -16,9 +16,13 @@ def get_entities_from_rmj(rmj_filename, rmj_to_gm):
     with open(rmj_filename) as f:
         line = f.readlines()[3]
         entities = list(group(line[1:].split(' '), 3))
+
+    entities2 = []
     for ent in entities:
-        ent[2] = rmj_to_gm[ent[2]]
-    return entities
+        if ent[2] in rmj_to_gm:
+            ent[2] = rmj_to_gm[ent[2]]
+            entities2.append(ent)
+    return entities2
 
 def write_room(entities, room_name, project_filename, template_filename):
     output_filename = os.path.join(os.path.split(project_filename)[0], 'rooms', '%s.room.gmx' % room_name)

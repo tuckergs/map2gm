@@ -5,8 +5,8 @@ import convert
 import sys
 import os
 
-def ask_path(entry):
-    path = filedialog.askopenfilename()
+def ask_path(entry, title, filetypes):
+    path = filedialog.askopenfilename(filetypes=filetypes,title=title)
     if path != "":
         entry.delete(0, tk.END)
         entry.insert(0, path)
@@ -17,23 +17,28 @@ def button_go():
     roomname = entry_roomname.get()
     template = entry_template.get()
     project = entry_project.get()
-    if rmj == '' or roomname == '' or template == '' or project == '':
+    rmj_to_gm = {}
+    emptyObject = False
+    for key, val in object_entries.items():
+        rmj_to_gm[key] = val.get()
+        if val.get() == '':
+            emptyObject = True
+
+    if rmj == '' or roomname == '' or template == '' or project == '' or emptyObject:
         messagebox.showinfo('', 'Cant have empty fields.')
         return
 
     with open('prefs', 'w') as f:
         f.write('template|%s\n' % template)
         f.write('project|%s\n' % project)
+        for key, value in object_entries.items():
+            f.write('%s|%s\n' % (key, value.get()))
 
     fn = os.path.join(os.path.split(project)[0], 'rooms', roomname + '.room.gmx')
     if os.path.exists(fn):
         messagebox.showinfo('', 'Room with that name currently exists. This tool won\'t overwrite it; delete the room manually if you\'re sure.')
         return
     try:
-        #','3':'start','20':'end'}
-        rmj_to_gm = {}
-        for key, val in object_entries.items():
-            rmj_to_gm[key] = val.get()
         entities = convert.get_entities_from_rmj(rmj, rmj_to_gm)
         convert.write_room(entities, roomname, project, template)
         convert.add_room_to_project(roomname, project)
@@ -41,21 +46,23 @@ def button_go():
         info = sys.exc_info()
         with open('errorlog.txt', 'w') as f:
             f.write('Last error:\n\n%s\n%s\n%s' % info)
+        #todo: print stack trace
         messagebox.showinfo('', 'There was an error when converting. Exception logged in errorlog.txt.\nLikely reasons: File at a path doesn\'t exist, File is the wrong type or is malformed, Don\'t have permissions to modify file. Hopefully it\'s not a bug in the program.')
+    messagebox.showinfo('', 'Successfully converted! Prefs saved.')
     
-def row_askpath(labeltext):
+def row_askpath(labeltext, title, filetypes):
     global row
-    tk.Label(root,text=labeltext).grid(row=row,column=0)
+    tk.Label(root,text=labeltext).grid(row=row,column=0,sticky=tk.E)
     entry = tk.Entry(root)
-    entry.grid(row=row,column=1)
-    tk.Button(root,text='find...',command=lambda: ask_path(entry)).grid(row=row,column=2)
+    entry.grid(row=row,column=1,sticky=tk.EW)
+    tk.Button(root,text='find...',command=lambda: ask_path(entry, title, filetypes)).grid(row=row,column=2,sticky=tk.EW)
     row += 1
     return entry
 def row_entry(labeltext):
     global row
-    tk.Label(root,text='Room name:').grid(row=row,column=0)
+    tk.Label(root,text='Room name:').grid(row=row,column=0,sticky=tk.E)
     entry = tk.Entry(root)
-    entry.grid(row=1,column=1)
+    entry.grid(row=1,column=1,sticky=tk.EW)
     row += 1
     return entry
 def row_object_old(rmj_id, image_filename):
@@ -86,18 +93,18 @@ object_images = [('2','images/temp.gif'),#block
                  ('11','images/temp.gif'),
                  ('10','images/temp.gif'),
                  ('9','images/temp.gif'),
-                 ('19','images/temp.gif'),#mini spike up right left down
-                 ('18','images/temp.gif'),
-                 ('17','images/temp.gif'),
-                 ('16','images/temp.gif'),
-                 ('32','images/temp.gif'),#save
-                 ('31','images/temp.gif'),#movingPlatform
-                 ('23','images/temp.gif'),#water1
-                 ('30','images/temp.gif'),#water2
-                 ('20','images/temp.gif'),#apple
-                 ('27','images/temp.gif'),#hurt block
-                 ('28','images/temp.gif'),#ivy right
-                 ('29','images/temp.gif'),#ivy left
+                 #('19','images/temp.gif'),#mini spike up right left down
+                 #('18','images/temp.gif'),
+                 #('17','images/temp.gif'),
+                 #('16','images/temp.gif'),
+                 #('32','images/temp.gif'),#save
+                 #('31','images/temp.gif'),#movingPlatform
+                 #('23','images/temp.gif'),#water1
+                 #('30','images/temp.gif'),#water2
+                 #('20','images/temp.gif'),#apple
+                 #('27','images/temp.gif'),#hurt block
+                 #('28','images/temp.gif'),#ivy right
+                 #('29','images/temp.gif'),#ivy left
                  ]
 
 objectrowheight = 40
@@ -107,18 +114,17 @@ canvasheight = (len(object_images) - 1) * objectrowheight
 row = 0
 root = tk.Tk()
 root.wm_title('RMJ to GM:S converter')
-root.resizable(0,0)
 
 object_entries = {}
 
-entry_rmj = row_askpath('RMJ file:')
+entry_rmj = row_askpath('RMJ map:', 'Select RMJ Map', [('RMJ map', '.map'),('all files', '.*')])
 entry_roomname = row_entry('Room name:')
-entry_template = row_askpath('Room template:')
-entry_project = row_askpath('Project file:')
+entry_template = row_askpath('Template room:', 'Select Template Room', [('GM:S room', '.room.gmx'),('all files', '.*')])
+entry_project = row_askpath('Project file:', 'Select Project', [('GM:S project', '.project.gmx'),('all files', '.*')])
 
 frame = tk.Frame(root,height=frameheight,relief=tk.GROOVE,borderwidth=2)
 frame.grid(row=row,column=0,columnspan=3,padx=5,pady=5)
-canvas = tk.Canvas(frame,height=600,scrollregion=(0,0,0,canvasheight),yscrollincrement=objectrowheight)
+canvas = tk.Canvas(frame,width='8c',height=600,scrollregion=(0,0,0,canvasheight),yscrollincrement=objectrowheight)
 row += 1
 objectrow = 0
 
@@ -134,6 +140,10 @@ canvas.pack(side=tk.LEFT,expand=True,fill=tk.BOTH,pady=20)
 
 tk.Button(root,text='Convert',command=button_go).grid(row=row,column=1)
 
+root.grid_columnconfigure(0, weight=1)
+root.grid_columnconfigure(1, weight=8)
+root.grid_columnconfigure(2, weight=1)
+
 if os.path.exists('prefs'):
     with open('prefs', 'r') as f:
         for line in f:
@@ -144,5 +154,7 @@ if os.path.exists('prefs'):
             elif type == 'project':
                 entry_project.insert(0, value)
                 entry_project.xview(tk.END)
+            else:
+                object_entries[type].insert(0, value)
 
 root.mainloop()
