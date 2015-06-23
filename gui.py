@@ -17,19 +17,23 @@ def button_go():
     roomname = entry_roomname.get()
     template = entry_template.get()
     project = entry_project.get()
+    if rmj == '' or roomname == '' or template == '' or project == '':
+        messagebox.showinfo('', 'One of the top fields is empty.')
+        return
     rmj_to_gm = {}
-    emptyObject = False
     for key, val in object_entries.items():
         text = val[0].get()
         enabled = val[1].get()
         if enabled:
-            rmj_to_gm[key] = text
-        if text == '' and enabled:
-            emptyObject = True
-
-    if rmj == '' or roomname == '' or template == '' or project == '' or emptyObject:
-        messagebox.showinfo('', 'Cant have empty fields.')
-        return
+            if text != '':
+                rmj_to_gm[key] = text
+                fn = os.path.join(os.path.split(project)[0], 'objects', text + '.object.gmx')
+                if not os.path.exists(fn):
+                    messagebox.showinfo('', 'Can\'t find object "%s" in the project.' % text)
+                    return
+            else:
+                messagebox.showinfo('', 'An enabled object has no name.')
+                return
 
     with open('prefs', 'w') as f:
         f.write('template|%s\n' % template)
