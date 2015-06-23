@@ -34,12 +34,12 @@ def button_go():
     with open('prefs', 'w') as f:
         f.write('template|%s\n' % template)
         f.write('project|%s\n' % project)
-        for key, value in object_entries.items():
+        for key, value in sorted(object_entries.items()):
             f.write('%s|%s|%s\n' % (key, value[0].get(), value[1].get()))
 
     fn = os.path.join(os.path.split(project)[0], 'rooms', roomname + '.room.gmx')
     if os.path.exists(fn):
-        messagebox.showinfo('', 'Room with that name currently exists. This tool won\'t overwrite it; delete the room manually if you\'re sure.')
+        messagebox.showinfo('', 'Room with that name currently exists. This tool won\'t overwrite it; delete the room manually from the project/rooms folder if you\'re sure.')
         return
     try:
         entities = convert.get_entities_from_rmj(rmj, rmj_to_gm)
@@ -79,33 +79,34 @@ def row_object(rmj_id, image_filename):
     photo = tk.PhotoImage(file=image_filename)
     w = tk.Label(root,image=photo)
     w.photo = photo # to prevent it from being garbage collected?
-    canvas.create_window((0,0+objectrow*objectrowheight),anchor=tk.W,window=w)
+    canvas.create_window((16,0+objectrow*objectrowheight),anchor=tk.CENTER,window=w)
     e = tk.Entry(root)
     canvas.create_window((50,0+objectrow*objectrowheight),anchor=tk.W,window=e)
     v = tk.IntVar()
     c = tk.Checkbutton(root,text="Enabled",variable=v,command=lambda: check_clicked(rmj_id))
+    v.set(1)
     canvas.create_window((200,0+objectrow*objectrowheight),anchor=tk.W,window=c)
     object_entries[rmj_id] = (e, v)
     objectrow += 1
 
 
-object_images = [('2','images/temp.gif'),#block
-                 ('12','images/temp.gif'),#spike up right left down
-                 ('11','images/temp.gif'),
-                 ('10','images/temp.gif'),
-                 ('9','images/temp.gif'),
-                 #('19','images/temp.gif'),#mini spike up right left down
-                 #('18','images/temp.gif'),
-                 #('17','images/temp.gif'),
-                 #('16','images/temp.gif'),
-                 #('32','images/temp.gif'),#save
-                 #('31','images/temp.gif'),#movingPlatform
-                 #('23','images/temp.gif'),#water1
-                 #('30','images/temp.gif'),#water2
-                 #('20','images/temp.gif'),#apple
-                 #('27','images/temp.gif'),#hurt block
-                 #('28','images/temp.gif'),#ivy right
-                 #('29','images/temp.gif'),#ivy left
+object_images = [('2','images/block.gif'),
+                 ('12','images/spikeup.gif'),
+                 ('11','images/spikeright.gif'),
+                 ('10','images/spikeleft.gif'),
+                 ('9','images/spikedown.gif'),
+                 ('19','images/minispikeup.gif'),
+                 ('18','images/minispikeright.gif'),
+                 ('17','images/minispikeleft.gif'),
+                 ('16','images/minispikedown.gif'),
+                 ('32','images/save.gif'),
+                 ('31','images/platform.gif'),
+                 ('23','images/water1.gif'),
+                 ('30','images/water2.gif'),
+                 ('20','images/cherry.gif'),
+                 ('27','images/hurtblock.gif'),
+                 ('28','images/vineright.gif'),
+                 ('29','images/vineleft.gif'),
                  ]
 
 objectrowheight = 40

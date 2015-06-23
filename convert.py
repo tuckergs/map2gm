@@ -44,7 +44,7 @@ def add_room_to_project(room_name, project_filename):
     lines = read_lines(project_filename)
     found = False
     for line in lines:
-        if room_name in line:
+        if ('rooms\%s' % room_name) in line:
             found = True
             break
     if not found:
