@@ -4,10 +4,14 @@ from tkinter import messagebox
 import convert
 import sys
 import os
+import localize
+
+def loc(key):
+    return localize.loc(key)
 
 def ask_path(entry, title, filetypes):
     path = filedialog.askopenfilename(filetypes=filetypes,title=title)
-    if path != "":
+    if path != '':
         entry.delete(0, tk.END)
         entry.insert(0, path)
         entry.xview(tk.END)
@@ -18,44 +22,43 @@ def button_go():
     template = entry_template.get()
     project = entry_project.get()
     if rmj == '' or roomname == '' or template == '' or project == '':
-        messagebox.showinfo('', 'One of the top fields is empty.')
+        messagebox.showinfo('', loc('error_top_field_empty'))
         return
     rmj_to_gm = {}
     for key, val in object_entries.items():
         text = val[0].get()
         enabled = val[1].get()
         if enabled:
-            if text != '':
+            if text == '':
+                messagebox.showinfo('', loc('error_object_no_name'))
+                return
+            else:
                 rmj_to_gm[key] = text
                 fn = os.path.join(os.path.split(project)[0], 'objects', text + '.object.gmx')
                 if not os.path.exists(fn):
-                    messagebox.showinfo('', 'Can\'t find object "%s" in the project.' % text)
+                    messagebox.showinfo('', loc('error_nonexistent_object') % text)
                     return
-            else:
-                messagebox.showinfo('', 'An enabled object has no name.')
-                return
-
-    with open('prefs', 'w') as f:
-        f.write('template|%s\n' % template)
-        f.write('project|%s\n' % project)
-        for key, value in sorted(object_entries.items()):
-            f.write('%s|%s|%s\n' % (key, value[0].get(), value[1].get()))
 
     fn = os.path.join(os.path.split(project)[0], 'rooms', roomname + '.room.gmx')
     if os.path.exists(fn):
-        messagebox.showinfo('', 'Room with that name currently exists. This tool won\'t overwrite it; delete the room manually from the project/rooms folder if you\'re sure.')
+        messagebox.showinfo('', loc('error_room_name_collision'))
         return
     try:
         entities = convert.get_entities_from_rmj(rmj, rmj_to_gm)
         convert.write_room(entities, roomname, project, template)
         convert.add_room_to_project(roomname, project)
+        with open('prefs', 'w') as f:
+            f.write('template|%s\n' % template)
+            f.write('project|%s\n' % project)
+            for key, value in sorted(object_entries.items()):
+                f.write('%s|%s|%s\n' % (key, value[0].get(), value[1].get()))
         messagebox.showinfo('', 'Successfully converted! Prefs saved.')
     except:
         info = sys.exc_info()
         with open('errorlog.txt', 'w') as f:
             f.write('Last error:\n\n%s\n%s\n%s' % info)
         #todo: print stack trace
-        messagebox.showinfo('', 'There was an error when converting. Exception logged in errorlog.txt.\nLikely reasons: File at a path doesn\'t exist, File is the wrong type or is malformed, Don\'t have permissions to modify file. Hopefully it\'s not a bug in the program.')
+        messagebox.showinfo('', loc('error_exception'))
     
 def row_askpath(labeltext, title, filetypes):
     global row
@@ -67,7 +70,7 @@ def row_askpath(labeltext, title, filetypes):
     return entry
 def row_entry(labeltext):
     global row
-    tk.Label(root,text='Room name:').grid(row=row,column=0,sticky=tk.E)
+    tk.Label(root,text=labeltext).grid(row=row,column=0,sticky=tk.E)
     entry = tk.Entry(root)
     entry.grid(row=1,column=1,sticky=tk.EW)
     row += 1
@@ -87,7 +90,7 @@ def row_object(rmj_id, image_filename):
     e = tk.Entry(root)
     canvas.create_window((50,0+objectrow*objectrowheight),anchor=tk.W,window=e)
     v = tk.IntVar()
-    c = tk.Checkbutton(root,text="Enabled",variable=v,command=lambda: check_clicked(rmj_id))
+    c = tk.Checkbutton(root,text=loc('label_object_enabled'),variable=v,command=lambda: check_clicked(rmj_id))
     v.set(1)
     canvas.create_window((200,0+objectrow*objectrowheight),anchor=tk.W,window=c)
     object_entries[rmj_id] = (e, v)
@@ -119,14 +122,14 @@ canvasheight = (len(object_images) - 1) * objectrowheight
 
 row = 0
 root = tk.Tk()
-root.wm_title('RMJ to GM:S converter')
+root.wm_title(loc('title'))
 
 object_entries = {}
 
-entry_rmj = row_askpath('RMJ map:', 'Select RMJ Map', [('RMJ map', '.map'),('all files', '.*')])
-entry_roomname = row_entry('Room name:')
-entry_template = row_askpath('Template room:', 'Select Template Room', [('GM:S room', '.room.gmx'),('all files', '.*')])
-entry_project = row_askpath('Project file:', 'Select Project', [('GM:S project', '.project.gmx'),('all files', '.*')])
+entry_rmj = row_askpath(loc('label_rmj_map'), loc('open_rmj_map'), [('RMJ map', '.map'),('all files', '.*')])
+entry_roomname = row_entry(loc('label_room_name'))
+entry_template = row_askpath(loc('label_template_room'), loc('open_template_room'), [('GM:S room', '.room.gmx'),('all files', '.*')])
+entry_project = row_askpath(loc('label_project_file'), loc('open_project_file'), [('GM:S project', '.project.gmx'),('all files', '.*')])
 
 frame = tk.Frame(root,height=frameheight,relief=tk.GROOVE,borderwidth=2)
 frame.grid(row=row,column=0,columnspan=3,padx=5,pady=5)
@@ -144,7 +147,7 @@ canvas.config(height=frameheight)
 canvas.config(yscrollcommand=vbar.set)
 canvas.pack(side=tk.LEFT,expand=True,fill=tk.BOTH,pady=20)
 
-tk.Button(root,text='Convert',command=button_go).grid(row=row,column=1)
+tk.Button(root,text=loc('button_convert'),command=button_go).grid(row=row,column=1)
 
 root.grid_columnconfigure(0, weight=1)
 root.grid_columnconfigure(1, weight=8)
