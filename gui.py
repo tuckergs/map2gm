@@ -96,6 +96,16 @@ def row_object(rmj_id, image_filename):
     object_entries[rmj_id] = (e, v)
     objectrow += 1
 
+root = tk.Tk()
+root.wm_title(loc('title'))
+img = tk.Image('photo', file='icon.png')
+root.tk.call('wm','iconphoto',root._w,img)
+
+row = 0
+entry_rmj = row_askpath(loc('label_rmj_map'), loc('open_rmj_map'), [('RMJ map', '.map'),('all files', '.*')])
+entry_roomname = row_entry(loc('label_room_name'))
+entry_template = row_askpath(loc('label_template_room'), loc('open_template_room'), [('GM:S room', '.room.gmx'),('all files', '.*')])
+entry_project = row_askpath(loc('label_project_file'), loc('open_project_file'), [('GM:S project', '.project.gmx'),('all files', '.*')])
 
 object_images = [('2','images/block.gif'),
                  ('12','images/spikeup.gif'),
@@ -120,23 +130,13 @@ objectrowheight = 40
 frameheight = 3 * objectrowheight
 canvasheight = (len(object_images) - 1) * objectrowheight
 
-row = 0
-root = tk.Tk()
-root.wm_title(loc('title'))
-
-object_entries = {}
-
-entry_rmj = row_askpath(loc('label_rmj_map'), loc('open_rmj_map'), [('RMJ map', '.map'),('all files', '.*')])
-entry_roomname = row_entry(loc('label_room_name'))
-entry_template = row_askpath(loc('label_template_room'), loc('open_template_room'), [('GM:S room', '.room.gmx'),('all files', '.*')])
-entry_project = row_askpath(loc('label_project_file'), loc('open_project_file'), [('GM:S project', '.project.gmx'),('all files', '.*')])
-
 frame = tk.Frame(root,height=frameheight,relief=tk.GROOVE,borderwidth=2)
 frame.grid(row=row,column=0,columnspan=3,padx=5,pady=5)
 canvas = tk.Canvas(frame,width='8c',height=600,scrollregion=(0,0,0,canvasheight),yscrollincrement=objectrowheight)
 row += 1
 objectrow = 0
 
+object_entries = {}
 for rmj_id, imagepath in object_images:
     row_object(rmj_id, imagepath)
 
