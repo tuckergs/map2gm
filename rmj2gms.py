@@ -6,6 +6,13 @@ import os, sys
 def loc(key):
     return localize.loc(key)
 
+def save_prefs(template, project, objects):
+    with open('prefs', 'w') as f:
+        f.write('template|%s\n' % template)
+        f.write('project|%s\n' % project)
+        for key, value in sorted(objects.items()):
+            f.write('%s|%s|%s\n' % (key, value[0], value[1]))
+
 def convert_pressed(rmj, roomname, template, project, objects):
     if rmj == '' or roomname == '' or template == '' or project == '':
         return loc('error_top_field_empty')
@@ -31,11 +38,7 @@ def convert_pressed(rmj, roomname, template, project, objects):
         entities = convert.get_entities_from_rmj(rmj, rmj_to_gm)
         convert.write_room(entities, roomname, project, template)
         convert.add_room_to_project(roomname, project)
-        with open('prefs', 'w') as f:
-            f.write('template|%s\n' % template)
-            f.write('project|%s\n' % project)
-            for key, value in sorted(objects.items()):
-                f.write('%s|%s|%s\n' % (key, value[0], value[1]))
+        save_prefs(template=template, project=project, objects=objects)
         return loc('convert_successful')
     except:
         info = sys.exc_info()

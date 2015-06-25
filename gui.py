@@ -1,10 +1,7 @@
 import tkinter as tk
-from tkinter import filedialog
-from tkinter import messagebox
-import convert
-import sys
-import os
-import localize
+from tkinter import filedialog, messagebox
+import convert, localize
+import sys, os
 
 def loc(key):
     return localize.loc(key)
@@ -56,7 +53,27 @@ def row_entry(labeltext):
     return entry
 
 def ask_overwrite(room_name):
-    return messagebox.askyesno(title=loc('warning_title'), message=loc('warning_overwrite_room') % room_name + '.room.gmx', type=messagebox.YESNO, icon=messagebox.WARNING)
+    return messagebox.askyesno(title=loc('warning_title'), message=loc('warning_overwrite_room') % (room_name + '.room.gmx'), type=messagebox.YESNO, icon=messagebox.WARNING)
+
+def load_prefs():
+    with open('prefs', 'r') as f:
+        for line in f:
+            args = line[:-1].split('|')
+            args += [''] * (3 - len(args))
+            type, value, arg3 = args
+            if type == 'template':
+                entry_template.insert(0, value)
+                entry_template.xview(tk.END)
+            elif type == 'project':
+                entry_project.insert(0, value)
+                entry_project.xview(tk.END)
+            else:
+                object_widgets[type][0].insert(0, value)
+                object_widgets[type][1].set(int(arg3))
+                if int(arg3) == 1:
+                    object_widgets[type][0].configure(state='normal')
+                else:
+                    object_widgets[type][0].configure(state='disabled')
 
 def run(convert_command):
     global root, canvas, row, objectrow, objectrowheight, object_widgets, entry_rmj, entry_roomname, entry_template, entry_project, button_convert
@@ -111,7 +128,6 @@ def run(convert_command):
         canvas.create_window((50,0+objectrow*objectrowheight),anchor=tk.W,window=e)
         v = tk.IntVar()
         c = tk.Checkbutton(root,text=loc('label_object_enabled'),variable=v,command=lambda rmj_id=rmj_id: check_clicked(rmj_id))
-        v.set(1)
         canvas.create_window((200,0+objectrow*objectrowheight),anchor=tk.W,window=c)
         object_widgets[rmj_id] = (e, v)
         objectrow += 1
@@ -129,27 +145,18 @@ def run(convert_command):
     root.grid_columnconfigure(0, weight=1, minsize=120)
     root.grid_columnconfigure(1, weight=8, minsize=150)
     root.grid_columnconfigure(2, weight=1, minsize=50)
+    root.grid_rowconfigure(0, weight=1)
+    root.grid_rowconfigure(1, weight=1)
+    root.grid_rowconfigure(2, weight=1)
+    root.grid_rowconfigure(3, weight=1)
     root.minsize(320, 350)
     root.geometry('320x350')
-    
+
     if os.path.exists('prefs'):
-        with open('prefs', 'r') as f:
-            for line in f:
-                args = line[:-1].split('|')
-                args += [''] * (3 - len(args))
-                type, value, arg3 = args
-                if type == 'template':
-                    entry_template.insert(0, value)
-                    entry_template.xview(tk.END)
-                elif type == 'project':
-                    entry_project.insert(0, value)
-                    entry_project.xview(tk.END)
-                else:
-                    object_widgets[type][0].insert(0, value)
-                    object_widgets[type][1].set(int(arg3))
-                    if int(arg3) == 1:
-                        object_widgets[type][0].configure(state='normal')
-                    else:
-                        object_widgets[type][0].configure(state='disabled')
-    
+        load_prefs()
+    else:
+        for id, widgets in object_widgets.items():
+            widgets[1].set(0)
+            check_clicked(id)
+
     root.mainloop()
