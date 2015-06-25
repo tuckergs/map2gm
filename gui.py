@@ -36,7 +36,8 @@ def button_go(convert_command):
     result = convert_command(rmj=rmj,roomname=roomname,template=template,project=project,objects=objects)
     button_convert.config(text=loc('button_convert') + '  ')
     root.update()
-    messagebox.showinfo('', result)
+    if result != None:
+        messagebox.showinfo('', result)
 
 def row_askpath(labeltext, title, filetypes):
     global row
@@ -53,6 +54,9 @@ def row_entry(labeltext):
     entry.grid(row=1,column=1,sticky=tk.EW)
     row += 1
     return entry
+
+def ask_overwrite(room_name):
+    return messagebox.askyesno(title=loc('warning_title'), message=loc('warning_overwrite_room') % room_name + '.room.gmx', type=messagebox.YESNO, icon=messagebox.WARNING)
 
 def run(convert_command):
     global root, canvas, row, objectrow, objectrowheight, object_widgets, entry_rmj, entry_roomname, entry_template, entry_project, button_convert
@@ -125,7 +129,7 @@ def run(convert_command):
     root.grid_columnconfigure(0, weight=1, minsize=120)
     root.grid_columnconfigure(1, weight=8, minsize=150)
     root.grid_columnconfigure(2, weight=1, minsize=50)
-    root.minsize(320, 200)
+    root.minsize(320, 350)
     root.geometry('320x350')
     
     if os.path.exists('prefs'):

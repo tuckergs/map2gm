@@ -21,7 +21,8 @@ def convert_pressed(rmj, roomname, template, project, objects):
                     return loc('error_nonexistent_object') % text
     fn = os.path.join(os.path.split(project)[0], 'rooms', roomname + '.room.gmx')
     if os.path.exists(fn):
-        return loc('error_room_name_collision')
+        if not gui.ask_overwrite(roomname):
+            return
     try:
         rmj_to_gm = {}
         for key, val in objects.items():
