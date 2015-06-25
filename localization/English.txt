@@ -14,5 +14,6 @@ error_top_field_empty=One of the top fields is empty.
 open_rmj_map=Select RMJ Map
 open_template_room=Select Template Room
 open_project_file=Select Project
+open_object=Select Object
 warning_title=Warning
 warning_overwrite_room=Room "%s" already exists in the rooms folder. Overwrite?

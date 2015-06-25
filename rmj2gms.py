@@ -1,6 +1,4 @@
-import convert
-import gui
-import localize
+import convert, gui, localize
 import os, sys
 
 def loc(key):

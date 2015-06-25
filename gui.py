@@ -7,17 +7,31 @@ def loc(key):
     return localize.loc(key)
 
 def ask_path(entry, title, filetypes):
-    path = filedialog.askopenfilename(filetypes=filetypes,title=title)
+    path = filedialog.askopenfilename(filetypes=filetypes,title=title,initialdir=os.path.dirname(os.path.realpath(__file__)))
     if path != '':
         entry.delete(0, tk.END)
         entry.insert(0, path)
         entry.xview(tk.END)
+def ask_objectname(entry):
+    objectsdir = os.path.join(os.path.split(entry_project.get())[0],'objects')
+    if os.path.isdir(objectsdir):
+        initialdir = objectsdir
+    else:
+        initialdir = os.path.dirname(os.path.realpath(__file__))
+    path = filedialog.askopenfilename(filetypes=[('GM:S object', '.object.gmx'),('all files', '.*')],title=loc('open_object'),initialdir=initialdir)
+    if path != '':
+        name = os.path.split(path)[1].split('.')[0]
+        entry.delete(0, tk.END)
+        entry.insert(0, name)
+        entry.xview(tk.END)
 def check_clicked(rmj_id):
     val = object_widgets[rmj_id][1].get()
     if val == 1:
-        object_widgets[rmj_id][0].configure(state='normal')
+        object_widgets[rmj_id][0].configure(state=tk.NORMAL)
+        object_widgets[rmj_id][2].configure(state=tk.NORMAL)
     else:
-        object_widgets[rmj_id][0].configure(state='disabled')
+        object_widgets[rmj_id][0].configure(state=tk.DISABLED)
+        object_widgets[rmj_id][2].configure(state=tk.DISABLED)
 def button_go(convert_command):
     button_convert.config(text=loc('button_convert_working') + '  ')
     root.update()
@@ -80,7 +94,7 @@ def run(convert_command):
     root = tk.Tk()
     root.resizable(True, True)
     root.wm_title(loc('title'))
-    icon_image = tk.Image('photo', file='icon.png')
+    icon_image = tk.Image('photo', file='images/icon.png')
     root.tk.call('wm','iconphoto',root._w,icon_image)
 
     row = 0
@@ -125,11 +139,13 @@ def run(convert_command):
         w.photo = photo # to prevent it from being garbage collected?
         canvas.create_window((16,0+objectrow*objectrowheight),anchor=tk.CENTER,window=w)
         e = tk.Entry(root)
-        canvas.create_window((50,0+objectrow*objectrowheight),anchor=tk.W,window=e)
+        canvas.create_window((50,0+objectrow*objectrowheight),anchor=tk.W,window=e,width=90)
+        b = tk.Button(root,text='find...',command=lambda e=e: ask_objectname(e))
+        canvas.create_window((150,0+objectrow*objectrowheight),anchor=tk.W,window=b,width=50,height=30)
         v = tk.IntVar()
         c = tk.Checkbutton(root,text=loc('label_object_enabled'),variable=v,command=lambda rmj_id=rmj_id: check_clicked(rmj_id))
         canvas.create_window((200,0+objectrow*objectrowheight),anchor=tk.W,window=c)
-        object_widgets[rmj_id] = (e, v)
+        object_widgets[rmj_id] = (e, v, b)
         objectrow += 1
 
     vbar=tk.Scrollbar(frame,orient=tk.VERTICAL)
