@@ -23,6 +23,8 @@ def check_clicked(rmj_id):
     else:
         object_widgets[rmj_id][0].configure(state='disabled')
 def button_go(convert_command):
+    button_convert.config(text=loc('button_convert_working') + '  ')
+    root.update()
     rmj = entry_rmj.get()
     roomname = entry_roomname.get()
     template = entry_template.get()
@@ -33,6 +35,8 @@ def button_go(convert_command):
         rmj_to_gm[key] = (val[0].get(), val[1].get())
     
     result = convert_command(rmj=rmj,roomname=roomname,template=template,project=project,rmj_to_gm=rmj_to_gm)
+    button_convert.config(text=loc('button_convert') + '  ')
+    root.update()
     messagebox.showinfo('', result)
 
 def row_askpath(labeltext, title, filetypes):
@@ -52,7 +56,7 @@ def row_entry(labeltext):
     return entry
 
 def run(convert_command):
-    global root, canvas, row, objectrow, objectrowheight, object_widgets, entry_rmj, entry_roomname, entry_template, entry_project
+    global root, canvas, row, objectrow, objectrowheight, object_widgets, entry_rmj, entry_roomname, entry_template, entry_project, button_convert
     root = tk.Tk()
     root.resizable(True, True)
     root.wm_title(loc('title'))
@@ -116,7 +120,8 @@ def run(convert_command):
     canvas.config(yscrollcommand=vbar.set)
     canvas.pack(side=tk.LEFT,expand=True,fill=tk.BOTH,pady=20)
 
-    tk.Button(root,text=loc('button_convert') + '  ',command=lambda: button_go(convert_command),image=icon_image,compound=tk.RIGHT).grid(row=row,column=1,columnspan=2,sticky=tk.NSEW)
+    button_convert = tk.Button(root,text=loc('button_convert') + '  ',command=lambda: button_go(convert_command),image=icon_image,compound=tk.RIGHT)
+    button_convert.grid(row=row,column=1,columnspan=2,sticky=tk.NSEW)
 
     root.grid_columnconfigure(0, weight=1, minsize=120)
     root.grid_columnconfigure(1, weight=8, minsize=150)

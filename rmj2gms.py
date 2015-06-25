@@ -34,7 +34,7 @@ def convert_pressed(rmj, roomname, template, project, rmj_to_gm):
             f.write('project|%s\n' % project)
             for key, value in sorted(rmj_to_gm.items()):
                 f.write('%s|%s|%s\n' % (key, value[0], value[1]))
-        return 'Successfully converted! Prefs saved.' # todo: loc this
+        return loc('convert_successful')
     except:
         info = sys.exc_info()
         with open('errorlog.txt', 'w') as f:
