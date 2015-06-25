@@ -16,7 +16,6 @@ def ask_path(entry, title, filetypes):
         entry.insert(0, path)
         entry.xview(tk.END)
 def check_clicked(rmj_id):
-    print(rmj_id)
     val = object_widgets[rmj_id][1].get()
     if val == 1:
         object_widgets[rmj_id][0].configure(state='normal')
@@ -30,11 +29,11 @@ def button_go(convert_command):
     template = entry_template.get()
     project = entry_project.get()
     
-    rmj_to_gm = {}
+    objects = {}
     for key, val in object_widgets.items():
-        rmj_to_gm[key] = (val[0].get(), val[1].get())
+        objects[key] = (val[0].get(), val[1].get())
     
-    result = convert_command(rmj=rmj,roomname=roomname,template=template,project=project,rmj_to_gm=rmj_to_gm)
+    result = convert_command(rmj=rmj,roomname=roomname,template=template,project=project,objects=objects)
     button_convert.config(text=loc('button_convert') + '  ')
     root.update()
     messagebox.showinfo('', result)

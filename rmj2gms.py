@@ -6,13 +6,10 @@ import os, sys
 def loc(key):
     return localize.loc(key)
 
-def convert_pressed(rmj, roomname, template, project, rmj_to_gm):
-    #for key, value in sorted(rmj_to_gm.items()):
-    #    print('%s|%s|%s\n' % (key, value[0], value[1]))
-    #return 'asdf'
+def convert_pressed(rmj, roomname, template, project, objects):
     if rmj == '' or roomname == '' or template == '' or project == '':
         return loc('error_top_field_empty')
-    for key, val in rmj_to_gm.items():
+    for key, val in objects.items():
         text = val[0]
         enabled = val[1]
         if enabled:
@@ -26,13 +23,17 @@ def convert_pressed(rmj, roomname, template, project, rmj_to_gm):
     if os.path.exists(fn):
         return loc('error_room_name_collision')
     try:
+        rmj_to_gm = {}
+        for key, val in objects.items():
+            if val[1] == 1:
+                rmj_to_gm[key] = val[0]
         entities = convert.get_entities_from_rmj(rmj, rmj_to_gm)
         convert.write_room(entities, roomname, project, template)
         convert.add_room_to_project(roomname, project)
         with open('prefs', 'w') as f:
             f.write('template|%s\n' % template)
             f.write('project|%s\n' % project)
-            for key, value in sorted(rmj_to_gm.items()):
+            for key, value in sorted(objects.items()):
                 f.write('%s|%s|%s\n' % (key, value[0], value[1]))
         return loc('convert_successful')
     except:
