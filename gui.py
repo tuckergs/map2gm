@@ -84,10 +84,7 @@ def load_prefs():
             else:
                 object_widgets[type][0].insert(0, value)
                 object_widgets[type][1].set(int(arg3))
-                if int(arg3) == 1:
-                    object_widgets[type][0].configure(state='normal')
-                else:
-                    object_widgets[type][0].configure(state='disabled')
+                check_clicked(type)
 
 def run(convert_command):
     global root, canvas, row, objectrow, objectrowheight, object_widgets, entry_rmj, entry_roomname, entry_template, entry_project, button_convert
@@ -120,6 +117,7 @@ def run(convert_command):
                      ('27','images/hurtblock.png'),
                      ('28','images/vineright.png'),
                      ('29','images/vineleft.png'),
+                     ('3','images/start.png'),
                      ]
 
     objectrowheight = 40
