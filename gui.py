@@ -179,7 +179,7 @@ def run(convert_command):
     root.grid_rowconfigure(2, weight=1)
     root.grid_rowconfigure(3, weight=1)
     root.minsize(370, 350)
-    root.geometry('370x350')
+    root.geometry('370x375')
 
     menubar = tk.Menu(root)
     languagemenu = tk.Menu(menubar, tearoff=0)
