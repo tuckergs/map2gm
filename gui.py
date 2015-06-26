@@ -69,6 +69,11 @@ def row_entry(labeltext):
 def ask_overwrite(room_name):
     return messagebox.askyesno(title=loc('warning_title'), message=loc('warning_overwrite_room') % (room_name + '.room.gmx'), type=messagebox.YESNO, icon=messagebox.WARNING)
 
+def change_language(language):
+    with open('lang', 'w') as f:
+        f.write(language + '\n')
+    os.execl(sys.executable, sys.executable, * sys.argv)
+
 def load_prefs():
     with open('prefs', 'r') as f:
         for line in f:
@@ -163,8 +168,15 @@ def run(convert_command):
     root.grid_rowconfigure(1, weight=1)
     root.grid_rowconfigure(2, weight=1)
     root.grid_rowconfigure(3, weight=1)
-    root.minsize(320, 350)
-    root.geometry('320x350')
+    root.minsize(370, 350)
+    root.geometry('370x350')
+
+    menubar = tk.Menu(root)
+    languagemenu = tk.Menu(menubar, tearoff=0)
+    languagemenu.add_command(label='English (restarts program)', command=lambda: change_language('English'), state=tk.DISABLED if localize.language == 'English' else tk.NORMAL)
+    languagemenu.add_command(label='TODO: Japanese (restarts program)', command=lambda: change_language('Japanese'), state=tk.DISABLED if localize.language == 'Japanese' else tk.NORMAL)
+    menubar.add_cascade(label=loc('menu_language'), menu=languagemenu)
+    root.config(menu=menubar)
 
     if os.path.exists('prefs'):
         load_prefs()

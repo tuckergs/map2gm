@@ -45,4 +45,11 @@ def convert_pressed(rmj, roomname, template, project, objects):
         #todo: print stack trace
         return loc('error_exception')
 
+if os.path.exists('lang'):
+    with open('lang', 'r') as f:
+        language = list(f)[0][:-1]
+else:
+    language = 'English'
+localize.load(language)
+
 gui.run(convert_command=convert_pressed)
