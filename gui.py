@@ -1,13 +1,23 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import convert, localize
-import sys, os
+import sys, os, imp
 
 def loc(key):
     return localize.loc(key)
 
+def main_is_frozen():
+   return (hasattr(sys, "frozen") or # new py2exe
+           hasattr(sys, "importers") # old py2exe
+           or imp.is_frozen("__main__")) # tools/freeze
+
+def get_default_dir():
+   if main_is_frozen():
+       return os.path.join(os.path.dirname(sys.executable), '..')
+   return os.path.dirname(sys.argv[0])
+
 def ask_path(entry, title, filetypes):
-    path = filedialog.askopenfilename(filetypes=filetypes,title=title,initialdir=os.path.dirname(os.path.realpath(__file__)))
+    path = filedialog.askopenfilename(filetypes=filetypes,title=title,initialdir=get_default_dir())
     if path != '':
         entry.delete(0, tk.END)
         entry.insert(0, path)
@@ -17,7 +27,7 @@ def ask_objectname(entry):
     if os.path.isdir(objectsdir):
         initialdir = objectsdir
     else:
-        initialdir = os.path.dirname(os.path.realpath(__file__))
+        initialdir = get_default_dir()
     path = filedialog.askopenfilename(filetypes=[('GM:S object', '.object.gmx'),('all files', '.*')],title=loc('open_object'),initialdir=initialdir)
     if path != '':
         name = os.path.split(path)[1].split('.')[0]
