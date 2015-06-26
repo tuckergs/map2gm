@@ -65,7 +65,7 @@ def row_askpath(labeltext, title, filetypes):
     tk.Label(root,text=labeltext).grid(row=row,column=0,sticky=tk.E)
     entry = tk.Entry(root)
     entry.grid(row=row,column=1,sticky=tk.EW)
-    tk.Button(root,text='find...',command=lambda: ask_path(entry, title, filetypes)).grid(row=row,column=2,sticky=tk.EW)
+    tk.Button(root,image=folder_image,width=35,height=25,command=lambda: ask_path(entry, title, filetypes)).grid(row=row,column=2)
     row += 1
     return entry
 def row_entry(labeltext):
@@ -102,10 +102,11 @@ def load_prefs():
                 check_clicked(type)
 
 def run(convert_command):
-    global root, canvas, row, objectrow, objectrowheight, object_widgets, entry_rmj, entry_roomname, entry_template, entry_project, button_convert
+    global root, canvas, row, objectrow, objectrowheight, object_widgets, entry_rmj, entry_roomname, entry_template, entry_project, button_convert, folder_image
     root = tk.Tk()
     root.resizable(True, True)
     root.wm_title(loc('title'))
+    folder_image = tk.Image('photo', file='images/folder.png')
     icon_image = tk.Image('photo', file='images/icon.png')
     root.tk.call('wm','iconphoto',root._w,icon_image)
 
@@ -152,12 +153,12 @@ def run(convert_command):
         w.photo = photo # to prevent it from being garbage collected?
         canvas.create_window((16,0+objectrow*objectrowheight),anchor=tk.CENTER,window=w)
         e = tk.Entry(root)
-        canvas.create_window((50,0+objectrow*objectrowheight),anchor=tk.W,window=e,width=90)
-        b = tk.Button(root,text='find...',command=lambda e=e: ask_objectname(e))
-        canvas.create_window((150,0+objectrow*objectrowheight),anchor=tk.W,window=b,width=50,height=30)
+        canvas.create_window((50,0+objectrow*objectrowheight),anchor=tk.W,window=e,width=120)
+        b = tk.Button(root,image=folder_image,command=lambda e=e: ask_objectname(e))
+        canvas.create_window((180,0+objectrow*objectrowheight),anchor=tk.W,window=b,width=40,height=30)
         v = tk.IntVar()
         c = tk.Checkbutton(root,text=loc('label_object_enabled'),variable=v,command=lambda rmj_id=rmj_id: check_clicked(rmj_id))
-        canvas.create_window((200,0+objectrow*objectrowheight),anchor=tk.W,window=c)
+        canvas.create_window((230,0+objectrow*objectrowheight),anchor=tk.W,window=c)
         object_widgets[rmj_id] = (e, v, b)
         objectrow += 1
 
@@ -173,7 +174,7 @@ def run(convert_command):
 
     root.grid_columnconfigure(0, weight=1, minsize=120)
     root.grid_columnconfigure(1, weight=8, minsize=150)
-    root.grid_columnconfigure(2, weight=1, minsize=50)
+    root.grid_columnconfigure(2, minsize=50)
     root.grid_rowconfigure(0, weight=1)
     root.grid_rowconfigure(1, weight=1)
     root.grid_rowconfigure(2, weight=1)
