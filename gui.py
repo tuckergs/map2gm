@@ -93,7 +93,7 @@ def ask_language():
         window.destroy()
         chosen = c
     tk.Button(window, text='English', command=lambda: choose('English')).grid(row=0,column=0,sticky=tk.NSEW,padx=10,pady=10)
-    tk.Button(window, text='日本人', command=lambda: choose('Japanese')).grid(row=0,column=1,sticky=tk.NSEW,padx=10,pady=10)
+    tk.Button(window, text='日本語', command=lambda: choose('Japanese')).grid(row=0,column=1,sticky=tk.NSEW,padx=10,pady=10)
     window.grid_columnconfigure(0, weight=1)
     window.grid_columnconfigure(1, weight=1)
     window.grid_rowconfigure(0, weight=1)
@@ -208,18 +208,18 @@ def run(convert_command):
     root.grid_rowconfigure(1, weight=1)
     root.grid_rowconfigure(2, weight=1)
     root.grid_rowconfigure(3, weight=1)
-    root.minsize(370, 350)
-    root.geometry('370x375')
+    root.minsize(400, 350)
+    root.geometry('400x375')
 
     menubar = tk.Menu(root)
     optionsmenu = tk.Menu(menubar, tearoff=False)
     menubar.add_cascade(label=loc('menu_options'), menu=optionsmenu)
-    languagemenu = tk.Menu(menubar, tearoff=False)
-    languagemenu.add_command(label='English (restarts program)', command=lambda: change_language('English'), state=tk.DISABLED if localize.language == 'English' else tk.NORMAL)
-    languagemenu.add_command(label='TODO: 日本人 (restarts program)', command=lambda: change_language('Japanese'), state=tk.DISABLED if localize.language == 'Japanese' else tk.NORMAL)
-    optionsmenu.add_cascade(label=loc('menu_language'), menu=languagemenu)
     optionsmenu.add_command(label=loc('menu_instructions'), command=lambda: show_instructions())
     optionsmenu.add_command(label=loc('menu_readme'), command=lambda: show_readme())
+    languagemenu = tk.Menu(menubar, tearoff=False)
+    languagemenu.add_command(label='English (restarts program)', command=lambda: change_language('English'), state=tk.DISABLED if localize.language == 'English' else tk.NORMAL)
+    languagemenu.add_command(label='日本語 (プログラームを再起動)', command=lambda: change_language('Japanese'), state=tk.DISABLED if localize.language == 'Japanese' else tk.NORMAL)
+    optionsmenu.add_cascade(label=loc('menu_language'), menu=languagemenu)
     root.config(menu=menubar)
 
     if os.path.exists('prefs'):
