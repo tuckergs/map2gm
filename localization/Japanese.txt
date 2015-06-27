@@ -17,4 +17,7 @@ open_project_file=プロジェクトを選択
 open_object=オブジェクトを選択
 warning_title=注意
 warning_overwrite_room="%s"のマップはもうあるです。 上書きます？
+menu_options=TODO
 menu_language=TODO
+menu_instructions=TODO
+menu_readme=TODO

@@ -42,14 +42,17 @@ def convert_pressed(rmj, roomname, template, project, objects):
         info = sys.exc_info()
         with open('errorlog.txt', 'w') as f:
             f.write('Last error:\n\n%s\n%s\n%s' % info)
-        #todo: print stack trace
         return loc('error_exception')
 
 if os.path.exists('lang'):
     with open('lang', 'r') as f:
-        language = list(f)[0][:-1]
+        language = list(f)[0]
+    localize.load(language)
 else:
-    language = 'English'
-localize.load(language)
+    language = gui.ask_language()
+    with open('lang', 'w') as f:
+        f.write(language)
+    localize.load(language)
+    gui.show_instructions()
 
 gui.run(convert_command=convert_pressed)

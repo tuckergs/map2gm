@@ -79,9 +79,30 @@ def row_entry(labeltext):
 def ask_overwrite(room_name):
     return messagebox.askyesno(title=loc('warning_title'), message=loc('warning_overwrite_room') % (room_name + '.room.gmx'), type=messagebox.YESNO, icon=messagebox.WARNING)
 
+def ask_language():
+    global chosen
+    window = tk.Tk()
+    window.resizable(False, False)
+    window.geometry('300x100')
+    window.wm_title('')
+    window.protocol('WM_DELETE_WINDOW', lambda: None)
+    icon_image = tk.Image('photo', file='images/icon.png')
+    window.tk.call('wm','iconphoto',window._w,icon_image)
+    def choose(c):
+        global chosen
+        window.destroy()
+        chosen = c
+    tk.Button(window, text='English', command=lambda: choose('English')).grid(row=0,column=0,sticky=tk.NSEW,padx=10,pady=10)
+    tk.Button(window, text='日本人', command=lambda: choose('Japanese')).grid(row=0,column=1,sticky=tk.NSEW,padx=10,pady=10)
+    window.grid_columnconfigure(0, weight=1)
+    window.grid_columnconfigure(1, weight=1)
+    window.grid_rowconfigure(0, weight=1)
+    window.mainloop()
+    return chosen
+
 def change_language(language):
     with open('lang', 'w') as f:
-        f.write(language + '\n')
+        f.write(language)
     os.execl(sys.executable, sys.executable, * sys.argv)
 
 def load_prefs():
@@ -100,6 +121,14 @@ def load_prefs():
                 object_widgets[type][0].insert(0, value)
                 object_widgets[type][1].set(int(arg3))
                 check_clicked(type)
+
+def show_instructions():
+    instructions = {'English':'instructions_en.html','Japanese':'instructions_jp.html'}
+    os.startfile(instructions[localize.language])
+
+def show_readme():
+    readmes = {'English':'readme_en.txt','Japanese':'readme_jp.txt'}
+    os.startfile(readmes[localize.language])
 
 def run(convert_command):
     global root, canvas, row, objectrow, objectrowheight, object_widgets, entry_rmj, entry_roomname, entry_template, entry_project, button_convert, folder_image
@@ -183,10 +212,14 @@ def run(convert_command):
     root.geometry('370x375')
 
     menubar = tk.Menu(root)
-    languagemenu = tk.Menu(menubar, tearoff=0)
+    optionsmenu = tk.Menu(menubar, tearoff=False)
+    menubar.add_cascade(label=loc('menu_options'), menu=optionsmenu)
+    languagemenu = tk.Menu(menubar, tearoff=False)
     languagemenu.add_command(label='English (restarts program)', command=lambda: change_language('English'), state=tk.DISABLED if localize.language == 'English' else tk.NORMAL)
-    languagemenu.add_command(label='TODO: Japanese (restarts program)', command=lambda: change_language('Japanese'), state=tk.DISABLED if localize.language == 'Japanese' else tk.NORMAL)
-    menubar.add_cascade(label=loc('menu_language'), menu=languagemenu)
+    languagemenu.add_command(label='TODO: 日本人 (restarts program)', command=lambda: change_language('Japanese'), state=tk.DISABLED if localize.language == 'Japanese' else tk.NORMAL)
+    optionsmenu.add_cascade(label=loc('menu_language'), menu=languagemenu)
+    optionsmenu.add_command(label=loc('menu_instructions'), command=lambda: show_instructions())
+    optionsmenu.add_command(label=loc('menu_readme'), command=lambda: show_readme())
     root.config(menu=menubar)
 
     if os.path.exists('prefs'):

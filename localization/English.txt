@@ -17,4 +17,7 @@ open_project_file=Select Project
 open_object=Select Object
 warning_title=Warning
 warning_overwrite_room=Room "%s" already exists in the rooms folder. Overwrite?
+menu_options=Options
 menu_language=Language
+menu_instructions=Show Instructions
+menu_readme=Show Readme
