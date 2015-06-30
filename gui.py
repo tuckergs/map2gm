@@ -46,7 +46,6 @@ def button_go(convert_command):
     button_convert.config(text=loc('button_convert_working') + '  ')
     root.update()
     rmj = entry_rmj.get()
-    roomname = entry_roomname.get()
     template = entry_template.get()
     project = entry_project.get()
     
@@ -54,7 +53,7 @@ def button_go(convert_command):
     for key, val in object_widgets.items():
         objects[key] = (val[0].get(), val[1].get())
     
-    result = convert_command(rmj=rmj,roomname=roomname,template=template,project=project,objects=objects)
+    result = convert_command(rmj=rmj,template=template,project=project,objects=objects)
     button_convert.config(text=loc('button_convert') + '  ')
     root.update()
     if result != None:
@@ -66,13 +65,6 @@ def row_askpath(labeltext, title, filetypes):
     entry = tk.Entry(root)
     entry.grid(row=row,column=1,sticky=tk.EW)
     tk.Button(root,image=folder_image,width=35,height=25,command=lambda: ask_path(entry, title, filetypes)).grid(row=row,column=2)
-    row += 1
-    return entry
-def row_entry(labeltext):
-    global row
-    tk.Label(root,text=labeltext).grid(row=row,column=0,sticky=tk.E)
-    entry = tk.Entry(root)
-    entry.grid(row=1,column=1,sticky=tk.EW)
     row += 1
     return entry
 
@@ -141,7 +133,6 @@ def run(convert_command):
 
     row = 0
     entry_rmj = row_askpath(loc('label_rmj_map'), loc('open_rmj_map'), [('RMJ map', '.map'),('all files', '.*')])
-    entry_roomname = row_entry(loc('label_room_name'))
     entry_project = row_askpath(loc('label_project_file'), loc('open_project_file'), [('GM:S project', '.project.gmx'),('all files', '.*')])
     entry_template = row_askpath(loc('label_template_room'), loc('open_template_room'), [('GM:S room', '.room.gmx'),('all files', '.*')])
 
@@ -204,12 +195,8 @@ def run(convert_command):
     root.grid_columnconfigure(0, weight=1, minsize=120)
     root.grid_columnconfigure(1, weight=8, minsize=150)
     root.grid_columnconfigure(2, minsize=50)
-    root.grid_rowconfigure(0, weight=1)
-    root.grid_rowconfigure(1, weight=1)
-    root.grid_rowconfigure(2, weight=1)
-    root.grid_rowconfigure(3, weight=1)
-    root.minsize(400, 350)
-    root.geometry('400x375')
+    root.minsize(400, 310)
+    root.geometry('400x335')
 
     menubar = tk.Menu(root)
     optionsmenu = tk.Menu(menubar, tearoff=False)

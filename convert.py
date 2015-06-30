@@ -12,6 +12,12 @@ def write_lines(filename, lines):
     with open(filename, 'w') as f:
         f.write(''.join(lines))
 
+def string_in_lines(lines, needle):
+    for line in lines:
+        if needle in line:
+            return True
+    return False
+
 def get_entities_from_rmj(rmj_filename, rmj_to_gm):
     with open(rmj_filename) as f:
         line = f.readlines()[3]
@@ -23,6 +29,19 @@ def get_entities_from_rmj(rmj_filename, rmj_to_gm):
             ent[2] = rmj_to_gm[ent[2]]
             entities2.append(ent)
     return entities2
+
+def get_room_names(rmj_filename, project_filename):
+    lines = read_lines(project_filename)
+    namebase = 'r_RMJ_%s_' % os.path.split(rmj_filename)[1].split('.')[0]
+    fnbase = os.path.join(os.path.split(project_filename)[0], 'rooms', '%s.room.gmx')
+    num = 0
+    roomname = namebase + str(num)
+    fn = fnbase % roomname
+    while string_in_lines(lines, 'rooms\\%s' % roomname):
+        num += 1
+        roomname = namebase + str(num)
+        fn = fnbase % roomname
+    return roomname, fn
 
 def write_room(entities, room_name, project_filename, template_filename):
     output_filename = os.path.join(os.path.split(project_filename)[0], 'rooms', '%s.room.gmx' % room_name)
@@ -42,20 +61,17 @@ def write_room(entities, room_name, project_filename, template_filename):
 
 def add_room_to_project(room_name, project_filename):
     lines = read_lines(project_filename)
-    found = False
-    for line in lines:
-        if ('rooms\%s' % room_name) in line:
-            found = True
-            break
-    if not found:
-        folder_name = 'RMJ imports'
-        try:
-            lines.index('    <rooms name="%s">\n' % folder_name)
-        except ValueError:
-            i = lines.index('  </rooms>\n')
-            lines.insert(i, '    <rooms name="%s">\n' % folder_name)
-            lines.insert(i + 1, '    </rooms>\n')
-        startindex = lines.index('    <rooms name="%s">\n' % folder_name) + 1
-        subbed = '      <room>rooms\%s</room>\n' % room_name
-        lines.insert(startindex, subbed)
-        write_lines(project_filename, lines)
+    folder_name = 'RMJ imports'
+    try:
+        lines.index('    <rooms name="%s">\n' % folder_name)
+    except ValueError:
+        i = lines.index('  </rooms>\n')
+        lines.insert(i, '    <rooms name="%s">\n' % folder_name)
+        lines.insert(i + 1, '    </rooms>\n')
+    startindex = lines.index('    <rooms name="%s">\n' % folder_name) + 1
+    endindex = startindex
+    while lines[endindex] != '    </rooms>\n':
+        endindex += 1
+    subbed = '      <room>rooms\%s</room>\n' % room_name
+    lines.insert(endindex, subbed)
+    write_lines(project_filename, lines)

@@ -11,8 +11,8 @@ def save_prefs(template, project, objects):
         for key, value in sorted(objects.items()):
             f.write('%s|%s|%s\n' % (key, value[0], value[1]))
 
-def convert_pressed(rmj, roomname, template, project, objects):
-    if rmj == '' or roomname == '' or template == '' or project == '':
+def convert_pressed(rmj, template, project, objects):
+    if rmj == '' or template == '' or project == '':
         return loc('error_top_field_empty')
     for key, val in objects.items():
         text = val[0]
@@ -24,10 +24,7 @@ def convert_pressed(rmj, roomname, template, project, objects):
                 fn = os.path.join(os.path.split(project)[0], 'objects', text + '.object.gmx')
                 if not os.path.exists(fn):
                     return loc('error_nonexistent_object') % text
-    fn = os.path.join(os.path.split(project)[0], 'rooms', roomname + '.room.gmx')
-    if os.path.exists(fn):
-        if not gui.ask_overwrite(roomname):
-            return
+    roomname, fn = convert.get_room_names(rmj, project)
     try:
         rmj_to_gm = {}
         for key, val in objects.items():
@@ -37,7 +34,7 @@ def convert_pressed(rmj, roomname, template, project, objects):
         convert.write_room(entities, roomname, project, template)
         convert.add_room_to_project(roomname, project)
         save_prefs(template=template, project=project, objects=objects)
-        return loc('convert_successful')
+        return loc('convert_successful') + ' ' + roomname
     except:
         info = sys.exc_info()
         with open('errorlog.txt', 'w') as f:
