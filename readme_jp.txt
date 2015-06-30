@@ -9,13 +9,13 @@
                                                    
 
 I Wanna Record my Jumps --> Game Maker: Studio
-Converter
+変換器
 
 ________________________________________________________
 ________________________________________________________
 
 
-Author:
+製作者:
 
         patrickgh3
 
@@ -23,27 +23,27 @@ Author:
         Email: patrickjtraynor@gmail.com
         Twitch: http://twitch.tv/patrickgh3
 
-Japanese Translation:
+翻訳者:
 
         Klazen108
 
         Twitch: http://twitch.tv/klazen108
+        翻訳者のノート：申し訳ありません。私の日本語はまだよくないです。
+
+________________________________________________________
+________________________________________________________
+
+まずにinstructions_jp.htmlを開けて読んでください。このツールは役に立つ場合、私に連絡してください。readmeに入ることを考えてください。アイワナを作るに頑張って！
+
+rmj2gmsはPythonで書きました。.ソースコードはこちら：https://github.com/patrickgh3/rmj2gms
 
 ________________________________________________________
 ________________________________________________________
 
 
-Open instructions_en.html to get started. If this tool is helpful to you, please contact me! Also consider listing it in your game's readme. Happy I Wanna making!
-
-rmj2gms is written in Python. Here's the source code: https://github.com/patrickgh3/rmj2gms
-
-________________________________________________________
-________________________________________________________
-
-
-I Wanna Record my Jumps by TheNewGeezer: http://delicious-fruit.com/ratings/game_details.php?id=12455
+TheNewGeezerさんの「I Wanna Record my Jumps」: http://delicious-fruit.com/ratings/game_details.php?id=12455
 
 Game Maker: Studio: http://www.yoyogames.com/studio/download
 
-I Wanna Be the Engine KS Edition (For GMStudio): http://www.iwannacommunity.com/forum/index.php?topic=1625.0'
+「I Wanna Be the Engine KS Edition (For GMStudio)」　GM:StudioのEngine系アイワナ: http://www.iwannacommunity.com/forum/index.php?topic=1625.0
 
