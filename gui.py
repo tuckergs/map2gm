@@ -16,14 +16,19 @@ def get_default_dir():
        return os.path.join(os.path.dirname(sys.executable), '..')
    return os.path.dirname(sys.argv[0])
 
-def ask_path(entry, title, filetypes):
-    path = filedialog.askopenfilename(filetypes=filetypes,title=title,initialdir=get_default_dir())
+def ask_path(entry, title, filetypes, isroom):
+    objectsdir = os.path.join(os.path.split(entry_project.get())[0], 'rooms')
+    if isroom and os.path.isdir(objectsdir):
+        initialdir = objectsdir
+    else:
+        initialdir = get_default_dir()
+    path = filedialog.askopenfilename(filetypes=filetypes,title=title,initialdir=initialdir)
     if path != '':
         entry.delete(0, tk.END)
         entry.insert(0, path)
         entry.xview(tk.END)
 def ask_objectname(entry):
-    objectsdir = os.path.join(os.path.split(entry_project.get())[0],'objects')
+    objectsdir = os.path.join(os.path.split(entry_project.get())[0], 'objects')
     if os.path.isdir(objectsdir):
         initialdir = objectsdir
     else:
@@ -59,12 +64,12 @@ def button_go(convert_command):
     if result != None:
         messagebox.showinfo('', result)
 
-def row_askpath(labeltext, title, filetypes):
+def row_askpath(labeltext, title, filetypes, isroom):
     global row
     tk.Label(root,text=labeltext).grid(row=row,column=0,sticky=tk.E)
     entry = tk.Entry(root)
     entry.grid(row=row,column=1,sticky=tk.EW)
-    tk.Button(root,image=folder_image,width=35,height=25,command=lambda: ask_path(entry, title, filetypes)).grid(row=row,column=2)
+    tk.Button(root,image=folder_image,width=35,height=25,command=lambda: ask_path(entry, title, filetypes, isroom)).grid(row=row,column=2)
     row += 1
     return entry
 
@@ -132,9 +137,9 @@ def run(convert_command):
     root.tk.call('wm','iconphoto',root._w,icon_image)
 
     row = 0
-    entry_rmj = row_askpath(loc('label_rmj_map'), loc('open_rmj_map'), [('RMJ map', '.map'),('all files', '.*')])
-    entry_project = row_askpath(loc('label_project_file'), loc('open_project_file'), [('GM:S project', '.project.gmx'),('all files', '.*')])
-    entry_template = row_askpath(loc('label_template_room'), loc('open_template_room'), [('GM:S room', '.room.gmx'),('all files', '.*')])
+    entry_rmj = row_askpath(loc('label_rmj_map'), loc('open_rmj_map'), [('RMJ map', '.map'),('all files', '.*')], False)
+    entry_project = row_askpath(loc('label_project_file'), loc('open_project_file'), [('GM:S project', '.project.gmx'),('all files', '.*')], False)
+    entry_template = row_askpath(loc('label_template_room'), loc('open_template_room'), [('GM:S room', '.room.gmx'),('all files', '.*')], True)
 
     object_images = [('2','images/block.png'),
                      ('12','images/spikeup.png'),
@@ -171,14 +176,14 @@ def run(convert_command):
         photo = tk.PhotoImage(file=imagepath)
         w = tk.Label(root,image=photo)
         w.photo = photo # to prevent it from being garbage collected?
-        canvas.create_window((16,0+objectrow*objectrowheight),anchor=tk.CENTER,window=w)
+        canvas.create_window((25,0+objectrow*objectrowheight),anchor=tk.CENTER,window=w)
         e = tk.Entry(root)
-        canvas.create_window((50,0+objectrow*objectrowheight),anchor=tk.W,window=e,width=120)
+        canvas.create_window((60,0+objectrow*objectrowheight),anchor=tk.W,window=e,width=120)
         b = tk.Button(root,image=folder_image,command=lambda e=e: ask_objectname(e))
-        canvas.create_window((180,0+objectrow*objectrowheight),anchor=tk.W,window=b,width=40,height=30)
+        canvas.create_window((190,0+objectrow*objectrowheight),anchor=tk.W,window=b,width=40,height=30)
         v = tk.IntVar()
         c = tk.Checkbutton(root,text=loc('label_object_enabled'),variable=v,command=lambda rmj_id=rmj_id: check_clicked(rmj_id))
-        canvas.create_window((230,0+objectrow*objectrowheight),anchor=tk.W,window=c)
+        canvas.create_window((240,0+objectrow*objectrowheight),anchor=tk.W,window=c)
         object_widgets[rmj_id] = (e, v, b)
         objectrow += 1
 
