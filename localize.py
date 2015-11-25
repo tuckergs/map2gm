@@ -7,7 +7,7 @@ def load(lang):
         for line in f:
             key, val = line[:-1].split('=')
             dict[key] = val
-            
+
 def loc(key):
     if key in dict:
         return dict[key]

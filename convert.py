@@ -4,8 +4,8 @@ def group(lst, n):
     for i in range(0, len(lst), n):
         val = lst[i:i+n]
         if len(val) == n:
-            yield val 
-def read_lines(filename):    
+            yield val
+def read_lines(filename):
     with open(filename, 'r') as f:
         return f.readlines()
 def write_lines(filename, lines):
