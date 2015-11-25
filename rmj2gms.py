@@ -1,3 +1,5 @@
+# entry point, input sanitization
+
 import convert, gui, localize
 import os, sys
 
@@ -52,4 +54,4 @@ else:
     localize.load(language)
     gui.show_instructions()
 
-gui.run(convert_command=convert_pressed)
+gui.run(submit_func=convert_pressed)
