@@ -24,12 +24,13 @@ def ask_path(entry, dialogtitle, filetypes, initialdir_func, format_func):
         entry.xview(tk.END)
 
 def row_askpath(row, labeltext, dialogtitle, filetypes, initialdir_func, format_func):
-    tk.Label(root,text=labeltext).grid(row=row,column=0,sticky=tk.E)
+    label = tk.Label(root,text=labeltext)
     entry = tk.Entry(root)
-    entry.grid(row=row,column=1,sticky=tk.EW)
     cmd = lambda: ask_path(entry, dialogtitle, filetypes, initialdir_func, format_func)
-    b = tk.Button(root,image=folder_image,width=35,height=25,command=cmd)
-    b.grid(row=row,column=2)
+    button = tk.Button(root,image=folder_image,width=35,height=25,command=cmd)
+    label.grid(row=row,column=0,sticky=tk.E)
+    entry.grid(row=row,column=1,sticky=tk.EW)
+    button.grid(row=row,column=2,sticky=tk.W)
     return entry
 
 def ask_language():
@@ -140,7 +141,7 @@ def run(submit_func):
 
     current_row += 1
     frame = tk.Frame(root,height=frameheight)
-    frame.grid(row=current_row,column=0,columnspan=3,padx=5,pady=5,sticky=tk.EW)
+    frame.grid(row=current_row,column=0,columnspan=3,padx=5,pady=5,sticky=tk.NS)
     canvas = tk.Canvas(frame,scrollregion=(0,0,0,canvasheight),yscrollincrement=objectrowheight)
     objectrow = 0
 
@@ -175,6 +176,8 @@ def run(submit_func):
     canvas.pack(side=tk.LEFT,expand=True,fill=tk.BOTH,pady=20)
 
     current_row += 1
+    filler_label = tk.Label(root)
+    filler_label.grid(row=current_row,column=0,columnspan=2,sticky=tk.NSEW)
     icon_image = tk.Image('photo', file='images/icon.png')
     convert_button = tk.Button(root,text=loc('button_convert') + '  ',image=icon_image,compound=tk.RIGHT,width=150)
     cmd = lambda: submit(submit_func, convert_button, project_textbox.get(), templateroom_textbox.get(), map_textbox.get(), {k: (v[0].get(),v[1].get()) for (k,v) in object_widgets.items()})
@@ -215,10 +218,10 @@ def run(submit_func):
     # configure window and enter its main loop
     root.update()
     root.minsize(root.winfo_width(), root.winfo_height())
-    root.grid_columnconfigure(0, weight=1, minsize=120)
+    root.grid_columnconfigure(0, weight=1, minsize=110)
     root.grid_columnconfigure(1, weight=8, minsize=150)
-    root.grid_columnconfigure(2, minsize=50)
-    root.grid_rowconfigure(current_row, weight=1)
+    root.grid_columnconfigure(2, weight=1, minsize=35)
+    root.grid_rowconfigure(current_row-1, weight=1)
     root.resizable(True, True)
     root.wm_title(loc('title'))
     root.tk.call('wm','iconphoto',root._w,icon_image)
