@@ -1,77 +1,90 @@
-import os
+# actual conversion logic
 
-def group(lst, n):
-    for i in range(0, len(lst), n):
-        val = lst[i:i+n]
-        if len(val) == n:
-            yield val
-def read_lines(filename):
-    with open(filename, 'r') as f:
-        return f.readlines()
-def write_lines(filename, lines):
-    with open(filename, 'w') as f:
-        f.write(''.join(lines))
+import os, random, xml.etree.ElementTree as ET
 
-def string_in_lines(lines, needle):
-    for line in lines:
-        if needle in line:
-            return True
-    return False
+object_ids = {
+    'block':(2,1),
+    'spikeup':(12,3),
+    'spikeright':(11,4),
+    'spikeleft':(10,5),
+    'spikedown':(9,6),
+    'miniup':(19,7),
+    'miniright':(18,8),
+    'minileft':(17,9),
+    'minidown':(16,10),
+    'save':(32,12),
+    'platform':(31,13),
+    'water1':(23,14),
+    'water2':(30,15),
+    'cherry':(20,11),
+    'hurtblock':(27,18),
+    'vineright':(28,17),
+    'vineleft':(29,16),
+    'start':(3,20),
+    }
 
-def get_entities_from_rmj(rmj_filename, rmj_to_gm):
-    with open(rmj_filename) as f:
+def convert(project_path, template_room_path, map_path, chosen_names):
+
+    # build conversion dicts according to chosen object names
+    rmj_to_objectname = {}
+    jtool_to_objectname = {}
+    for name, gm_name in chosen_names.items():
+        rmj_id, jtool_id = object_ids[name]
+        rmj_to_objectname[str(rmj_id)] = gm_name
+        jtool_to_objectname[str(jtool_id)] = gm_name
+
+    # read instances from map file
+    map_instances = []
+    with open(map_path) as f:
         line = f.readlines()[3]
-        entities = list(group(line[1:].split(' '), 3))
+    numbers = line[1:].split(' ')
+    for i in range(0, len(numbers), 3):
+        x, y, id = numbers[i:i+3]
+        if id in rmj_to_objectname:
+            map_instances.append((x,y,rmj_to_objectname[id]))
 
-    entities2 = []
-    for ent in entities:
-        if ent[2] in rmj_to_gm:
-            ent[2] = rmj_to_gm[ent[2]]
-            entities2.append(ent)
-    return entities2
+    # determine room name to avoid naming conflict
+    output_room_name = 'rMapImport_%s' % os.path.split(map_path)[1].split('.')[0]
+    project_tree = ET.parse(project_path)
+    project_root = project_tree.getroot()
+    def room_exists(roomname):
+        for room_element in project_root.find('rooms').iter('room'):
+            if room_element.text.split('\\')[1] == roomname:
+                return True
+        return False
+    if room_exists(output_room_name):
+        counter = 1
+        base_room_name = output_room_name + '_'
+        output_room_name = base_room_name + str(counter)
+        while room_exists(output_room_name):
+            counter += 1
+            output_room_name = base_room_name + str(counter)
 
-def get_room_names(rmj_filename, project_filename):
-    lines = read_lines(project_filename)
-    namebase = 'r_RMJ_%s_' % os.path.split(rmj_filename)[1].split('.')[0]
-    fnbase = os.path.join(os.path.split(project_filename)[0], 'rooms', '%s.room.gmx')
-    num = 0
-    roomname = namebase + str(num)
-    fn = fnbase % roomname
-    while string_in_lines(lines, 'rooms\\%s' % roomname):
-        num += 1
-        roomname = namebase + str(num)
-        fn = fnbase % roomname
-    return roomname, fn
+    output_room_path = os.path.join(os.path.split(project_path)[0],'rooms',output_room_name+'.room.gmx')
 
-def write_room(entities, room_name, project_filename, template_filename):
-    output_filename = os.path.join(os.path.split(project_filename)[0], 'rooms', '%s.room.gmx' % room_name)
-    lines = read_lines(template_filename)
-    try:
-        i = lines.index('  <instances/>\n')
-        lines[i] = '  <instances>\n'
-        lines.insert(i + 1, '  </instances>\n')
-    except ValueError:
-        pass
-    formatstring = '    <instance objName="%s" x="%s" y="%s" name="inst_%s" locked="0" code="" scaleX="1" scaleY="1" colour="4294967295" rotation="0"/>\n'
-    startindex = lines.index('  <instances>\n') + 1
-    for i, ent in enumerate(entities):
-        subbed = formatstring % (ent[2], ent[0], ent[1], hex(i)[2:].upper().zfill(8))
-        lines.insert(startindex, subbed)
-    write_lines(output_filename, lines)
+    # create a new room file (based on template) with the instances added
+    output_room_tree = ET.parse(template_room_path)
+    instances_element = output_room_tree.getroot().find('instances')
+    for x, y, name in map_instances:
+        attrib = {}
+        attrib['x'] = x
+        attrib['y'] = y
+        attrib['objName'] = name
+        attrib['locked'] = '0'
+        attrib['code'] = ''
+        attrib['scaleX'] = '1'
+        attrib['scaleY'] = '1'
+        attrib['colour'] = '4294967295'
+        attrib['rotation'] = '0'
+        attrib['name'] = 'inst_'+''.join([random.choice('0123456789ABCDEF') for i in range(8)])
+        new_element = ET.Element('instance', attrib=attrib)
+        instances_element.append(new_element)
+        output_room_tree.write(output_room_path)
 
-def add_room_to_project(room_name, project_filename):
-    lines = read_lines(project_filename)
-    folder_name = 'RMJ imports'
-    try:
-        lines.index('    <rooms name="%s">\n' % folder_name)
-    except ValueError:
-        i = lines.index('  </rooms>\n')
-        lines.insert(i, '    <rooms name="%s">\n' % folder_name)
-        lines.insert(i + 1, '    </rooms>\n')
-    startindex = lines.index('    <rooms name="%s">\n' % folder_name) + 1
-    endindex = startindex
-    while lines[endindex] != '    </rooms>\n':
-        endindex += 1
-    subbed = '      <room>rooms\%s</room>\n' % room_name
-    lines.insert(endindex, subbed)
-    write_lines(project_filename, lines)
+    # add our new room to the project
+    new_room_element = ET.Element('room')
+    new_room_element.text = 'rooms\\'+output_room_name
+    project_root.find('rooms').append(new_room_element)
+    project_tree.write(project_path)
+
+    return output_room_name

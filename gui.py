@@ -1,8 +1,8 @@
-# handles user input / controls window
+# window for user input
 
 import sys, os, traceback, webbrowser, tkinter as tk
 from tkinter import filedialog, messagebox
-import convert, localize
+import localize
 
 def loc(key):
     return localize.loc(key)
@@ -74,10 +74,9 @@ def submit(submit_function, convert_button, *args):
     try:
         message = submit_function(*args)
     except:
+        #TODO: localize
         message = 'There was an error. Please tell Patrick about this.\n%s' % traceback.format_exc()
         traceback.print_exc()
-
-    print(args)
 
     convert_button.config(text=loc('button_convert') + '  ')
     root.update()
@@ -115,26 +114,27 @@ def run(submit_func):
     format_func = lambda path: path
     map_textbox = row_askpath(current_row, labeltext, dialogtitle, filetypes, initialdir_func, format_func)
 
-    object_images = [('block','images/block.png'),#2
-                     ('spikeup','images/spikeup.png'),#12
-                     ('spikeright','images/spikeright.png'),#11
-                     ('spikeleft','images/spikeleft.png'),#10
-                     ('spikedown','images/spikedown.png'),#9
-                     ('miniup','images/miniup.png'),#19
-                     ('miniright','images/miniright.png'),#18
-                     ('minileft','images/minileft.png'),#17
-                     ('minidown','images/minidown.png'),#16
-                     ('save','images/save.png'),#32
-                     ('platform','images/platform.png'),#31
-                     ('water1','images/water1.png'),#23
-                     ('water2','images/water2.png'),#30
-                     ('cherry','images/cherry.png'),#20
-                     ('hurtblock','images/hurtblock.png'),#27
-                     ('vineright','images/vineright.png'),#28
-                     ('vineleft','images/vineleft.png'),#29
-                     ('start','images/start.png'),#3
-                     ]
-
+    object_names = [
+        'block',
+        'spikeup',
+        'spikeright',
+        'spikeleft',
+        'spikedown',
+        'miniup',
+        'miniright',
+        'minileft',
+        'minidown',
+        'save',
+        'platform',
+        'water1',
+        'water2',
+        'cherry',
+        'hurtblock',
+        'vineright',
+        'vineleft',
+        'start',
+        ]
+    object_images = [(o,'images/%s.png'%o) for o in object_names]
     objectrowheight = 40
     frameheight = 3 * objectrowheight
     canvasheight = (len(object_images) - 1) * objectrowheight
@@ -156,7 +156,7 @@ def run(submit_func):
 
         initialdir_func = lambda: os.path.join(os.path.split(project_textbox.get())[0],'objects')
         format_func = lambda path: os.path.split(path)[1].split('.')[0]
-        cmd = lambda: ask_path(e, loc('open_object'), [('GM:S object', '.object.gmx')], initialdir_func, format_func)
+        cmd = lambda entry=e,ifunc=initialdir_func,ffunc=format_func: ask_path(entry, loc('open_object'), [('GM:S object', '.object.gmx')], ifunc, ffunc)
         b = tk.Button(root,image=folder_image,command=cmd,state=tk.DISABLED)
 
         canvas.create_window((190,0+objectrow*objectrowheight),anchor=tk.W,window=b,width=40,height=30)
@@ -190,7 +190,7 @@ def run(submit_func):
             for line in f:
                 args = line[:-1].split('|')
                 args += [''] * (3 - len(args))
-                type, value, arg3 = args
+                type, value, checked = args
                 if type == 'template':
                     templateroom_textbox.insert(0, value)
                     templateroom_textbox.xview(tk.END)
@@ -198,9 +198,11 @@ def run(submit_func):
                     project_textbox.insert(0, value)
                     project_textbox.xview(tk.END)
                 else:
-                    object_widgets[type][0].insert(0, value)
-                    object_widgets[type][1].set(int(arg3))
-                    update_object_widgets(type)
+                    entry, var, button = object_widgets[type]
+                    entry.configure(state=tk.NORMAL)
+                    entry.insert(0, value)
+                    var.set(int(checked))
+                    update_object_widgets(var.get(), entry, button)
 
     # menu bar
     menubar = tk.Menu(root)

@@ -1,4 +1,4 @@
-title=RMJ to GM:S converter
+title=Needle map to GM converter
 label_rmj_map=Map:
 label_room_name=Room name:
 label_template_room=Template room:
@@ -19,6 +19,6 @@ warning_title=Warning
 warning_overwrite_room=Room "%s" already exists in the rooms folder. Overwrite?
 menu_toplevel=Menu
 menu_language=Language
-menu_instructions=Open Instructions
-menu_readme=Open Readme
+menu_instructions=Open instructions
+menu_readme=Open readme
 menu_forum_thread=Open forum thread
