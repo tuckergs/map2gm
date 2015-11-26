@@ -1,5 +1,5 @@
 title=Needle map to GM converter
-label_rmj_map=Map:
+label_map=Map:
 label_room_name=Room name:
 label_template_room=Template room:
 label_project_file=Project:
@@ -11,7 +11,7 @@ error_exception=There was an error when converting. Exception logged in errorlog
 error_object_no_name=An enabled object has no name.
 error_nonexistent_object=Can't find object "%s" in the project.
 error_top_field_empty=One of the top fields is empty.
-open_rmj_map=Select RMJ Map
+open_map=Select Map
 open_template_room=Select Template Room
 open_project_file=Select Project
 open_object=Select Object

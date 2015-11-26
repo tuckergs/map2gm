@@ -1,6 +1,6 @@
 # actual conversion logic
 
-import os, random, xml.etree.ElementTree as ET
+import os, random, math, xml.etree.ElementTree as ET
 
 object_ids = {
     'block':(2,1),
@@ -35,16 +35,47 @@ def convert(project_path, template_room_path, map_path, chosen_names):
 
     # read instances from map file
     map_instances = []
-    with open(map_path) as f:
-        line = f.readlines()[3]
-    numbers = line[1:].split(' ')
-    for i in range(0, len(numbers), 3):
-        x, y, id = numbers[i:i+3]
-        if id in rmj_to_objectname:
-            map_instances.append((x,y,rmj_to_objectname[id]))
+    extension = map_path.split('.')[-1]
+    if extension == 'map':
+        with open(map_path) as f:
+            line = f.readlines()[3]
+        numbers = line[1:].split(' ')
+        for i in range(0, len(numbers), 3):
+            x, y, id = numbers[i:i+3]
+            if id in rmj_to_objectname:
+                map_instances.append((x,y,rmj_to_objectname[id]))
+    elif extension == 'jmap':
+        with open(map_path) as f:
+            sections = f.readline().split('|')
+        def base32string_decode(string):
+            base32string = '0123456789abcdefghijklmnopqrstuv'
+            result = 0
+            for i, char in enumerate(string):
+                charvalue = base32string.index(char)
+                placevalue = math.pow(32, len(string)-i-1)
+                result += charvalue * placevalue
+            return str(int(result))
+        for section in sections:
+            if section.split(':')[0] == 'objects':
+                objectstring = section.split(':')[1]
+        for ypos_section in objectstring.split('-'):
+            y = ypos_section[0:2]
+            y = base32string_decode(y)
+            y = str(int(y)-128)
+            ypos_section = ypos_section[2:]
+            for i in range(0, len(ypos_section), 3):
+                id = ypos_section[i]
+                id = base32string_decode(id)
+                x = ypos_section[i+1:i+3]
+                x = base32string_decode(x)
+                x = str(int(x)-128)
+                if id in jtool_to_objectname:
+                    map_instances.append((x,y,jtool_to_objectname[id]))
 
     # determine room name to avoid naming conflict
     output_room_name = 'rMapImport_%s' % os.path.split(map_path)[1].split('.')[0]
+    valid_chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'
+    output_room_name = ''.join([char if char in valid_chars else '_' for char in output_room_name])
     project_tree = ET.parse(project_path)
     project_root = project_tree.getroot()
     def room_exists(roomname):

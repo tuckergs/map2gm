@@ -1,5 +1,5 @@
 title=RMJからGM:Sに変化のプログラーム
-label_rmj_map=RMJ マップ:
+label_map=マップ:
 label_room_name=ルーム名:
 label_template_room=テンプレートのマップ:
 label_project_file=プロジェクトのファイル:
@@ -11,7 +11,7 @@ error_exception=変化作業中でエーラがおきました。 エーラの説
 error_object_no_name=使用可能のオブジェクトは名がないです。
 error_nonexistent_object="%s"のオブジェクトをプロジェクトに見つかりません。
 error_top_field_empty=入力フィールドを全て書き込んで下さい。
-open_rmj_map=RMJのマップを選択
+open_map=のマップを選択
 open_template_room=テンプレートのマップを選択
 open_project_file=プロジェクトを選択
 open_object=オブジェクトを選択

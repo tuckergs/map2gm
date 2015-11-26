@@ -107,9 +107,9 @@ def run(submit_func):
     templateroom_textbox = row_askpath(current_row, labeltext, dialogtitle, filetypes, initialdir_func, format_func)
 
     current_row += 1
-    labeltext = loc('label_rmj_map')
-    dialogtitle = loc('open_rmj_map')
-    filetypes = [('RMJ map', '.map')]
+    labeltext = loc('label_map')
+    dialogtitle = loc('open_map')
+    filetypes = [('Jtool or Record My Jumps map', '*.*map')]
     initialdir_func = lambda: ''
     format_func = lambda path: path
     map_textbox = row_askpath(current_row, labeltext, dialogtitle, filetypes, initialdir_func, format_func)
