@@ -4,6 +4,7 @@ import os, random, math, xml.etree.ElementTree as ET
 
 object_ids = {
     'block':(2,1),
+    'miniblock':(None,2),
     'spikeup':(12,3),
     'spikeright':(11,4),
     'spikeleft':(10,5),
@@ -16,11 +17,15 @@ object_ids = {
     'platform':(31,13),
     'water1':(23,14),
     'water2':(30,15),
+    'water3':(None,23),
     'cherry':(20,11),
     'hurtblock':(27,18),
     'vineright':(28,17),
     'vineleft':(29,16),
+    'jumprefresher':(None,22),
+    'bulletblocker':(None,19),
     'start':(3,20),
+    'warp':(None,21),
     }
 
 def convert(project_path, template_room_path, map_path, chosen_names):
@@ -30,7 +35,8 @@ def convert(project_path, template_room_path, map_path, chosen_names):
     jtool_to_objectname = {}
     for name, gm_name in chosen_names.items():
         rmj_id, jtool_id = object_ids[name]
-        rmj_to_objectname[str(rmj_id)] = gm_name
+        if rmj_id != None:
+            rmj_to_objectname[str(rmj_id)] = gm_name
         jtool_to_objectname[str(jtool_id)] = gm_name
 
     # read instances from map file

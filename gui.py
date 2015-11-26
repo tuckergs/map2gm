@@ -120,6 +120,7 @@ def run(submit_func):
         'spikeright',
         'spikeleft',
         'spikedown',
+        'miniblock',
         'miniup',
         'miniright',
         'minileft',
@@ -128,15 +129,19 @@ def run(submit_func):
         'platform',
         'water1',
         'water2',
+        'water3',
         'cherry',
         'hurtblock',
         'vineright',
         'vineleft',
+        'jumprefresher',
+        'bulletblocker',
         'start',
+        'warp',
         ]
     object_images = [(o,'images/%s.png'%o) for o in object_names]
     objectrowheight = 40
-    frameheight = 3 * objectrowheight
+    frameheight = 5 * objectrowheight
     canvasheight = (len(object_images) - 1) * objectrowheight
 
     current_row += 1
