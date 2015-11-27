@@ -91,8 +91,8 @@ def run(submit_func):
 
     # window contents
     current_row = 0
-    labeltext = loc('label_project_file')
-    dialogtitle = loc('open_project_file')
+    labeltext = loc('label_project')
+    dialogtitle = loc('open_project')
     filetypes = [('GameMaker: Studio project', '.project.gmx')]
     initialdir_func = lambda: ''
     format_func = lambda path: path

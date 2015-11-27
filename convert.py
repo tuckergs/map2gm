@@ -1,6 +1,6 @@
 # actual conversion logic
 
-import os, random, math, xml.etree.ElementTree as ET
+import os, sys, random, math, xml.etree.ElementTree as ET
 
 object_ids = {
     'block':(2,1),
@@ -78,26 +78,16 @@ def convert(project_path, template_room_path, map_path, chosen_names):
                 if id in jtool_to_objectname:
                     map_instances.append((x,y,jtool_to_objectname[id]))
 
-    # determine room name to avoid naming conflict
+    # construct valid output room name and path
     output_room_name = 'rMapImport_%s' % os.path.split(map_path)[1].split('.')[0]
     valid_chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'
     output_room_name = ''.join([char if char in valid_chars else '_' for char in output_room_name])
-    project_tree = ET.parse(project_path)
-    project_root = project_tree.getroot()
-    def room_exists(roomname):
-        for room_element in project_root.find('rooms').iter('room'):
-            if room_element.text.split('\\')[1] == roomname:
-                return True
-        return False
-    if room_exists(output_room_name):
-        counter = 1
-        base_room_name = output_room_name + '_'
-        output_room_name = base_room_name + str(counter)
-        while room_exists(output_room_name):
-            counter += 1
-            output_room_name = base_room_name + str(counter)
-
-    output_room_path = os.path.join(os.path.split(project_path)[0],'rooms',output_room_name+'.room.gmx')
+    # determine if application is a script file or frozen exe
+    if getattr(sys, 'frozen', False):
+        application_path = os.path.dirname(sys.executable)
+    elif __file__:
+        application_path = os.path.dirname(__file__)
+    output_room_path = os.path.join(application_path, output_room_name+'.room.gmx')
 
     # create a new room file (based on template) with the instances added
     output_room_tree = ET.parse(template_room_path)
@@ -117,11 +107,5 @@ def convert(project_path, template_room_path, map_path, chosen_names):
         new_element = ET.Element('instance', attrib=attrib)
         instances_element.append(new_element)
         output_room_tree.write(output_room_path)
-
-    # add our new room to the project
-    new_room_element = ET.Element('room')
-    new_room_element.text = 'rooms\\'+output_room_name
-    project_root.find('rooms').append(new_room_element)
-    project_tree.write(project_path)
 
     return output_room_name

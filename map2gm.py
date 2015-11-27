@@ -45,7 +45,7 @@ def submitted(project_path, template_room_name, map_path, object_inputs):
         for object_name, (gm_object_name, enabled) in sorted(object_inputs.items()):
             f.write('%s|%s|%i\n' % (object_name, gm_object_name, enabled))
 
-    return loc('convert_successful') + ' ' + output_room_name
+    return loc('convert_success') % output_room_name
 
 # prompt and load language
 if os.path.exists('lang'):
