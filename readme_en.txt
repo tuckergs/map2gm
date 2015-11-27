@@ -1,52 +1,26 @@
-  ___ __  __    _        __        ___ __  __ _ ___ 
- | _ \  \/  |_ | |     __\ \      / __|  \/  (_) __|
- |   / |\/| | || |    |___> >    | (_ | |\/| |_\__ \
- |_|_\_|  |_|\__/        /_/      \___|_|  |_(_)___/
-   ___                     _                        
-  / __|___ _ ___ _____ _ _| |_ ___ _ _              
- | (__/ _ \ ' \ V / -_) '_|  _/ -_) '_|             
-  \___\___/_||_\_/\___|_|  \__\___|_|               
-                                                   
+ _____
+|     |
+|    _|___    Needle Map to GM Converter
+|___| /   |
+    | \___|   by patrickgh3
+    |_____|
 
-I Wanna Record my Jumps --> Game Maker: Studio
-Converter
+This is a tool that automates transferring over objects from RMJ and Jtool maps
+into GameMaker. I thought that this tool would be very useful for making
+needle games, and I was in the mood to make it, so I made it.
 
-v1.0
-July 7, 2015
+Please contact me with any questions, comments, bug reports, feature ideas, or
+love notes. My skype name is patrickgh3, and my twitch channel is
+twitch.tv/patrickgh3. You can also find the forum thread for this tool at
+bit.ly/needle-map-to-gm.
 
-________________________________________________________
-________________________________________________________
+Translation info here
 
+--  Usage notes  --
 
-Author:
+todo: this
 
-        patrickgh3
+--  Other stuff  --
 
-        Skype: patrickgh3
-        Email: patrickjtraynor@gmail.com
-        Twitch: http://twitch.tv/patrickgh3
-
-Japanese Translation:
-
-        Klazen108
-
-        Twitch: http://twitch.tv/klazen108
-
-________________________________________________________
-________________________________________________________
-
-
-Open instructions_en.html to get started. If this tool is helpful to you, please contact me! Also consider listing it in your game's readme. Happy I Wanna making!
-
-rmj2gms is written in Python. Here's the source code: https://github.com/patrickgh3/rmj2gms
-
-________________________________________________________
-________________________________________________________
-
-
-I Wanna Record my Jumps by TheNewGeezer: http://delicious-fruit.com/ratings/game_details.php?id=12455
-
-Game Maker: Studio: http://www.yoyogames.com/studio/download
-
-I Wanna Be the Engine KS Edition (For GMStudio): http://www.iwannacommunity.com/forum/index.php?topic=1625.0'
-
+I Wanna Record my Jumps by Thenewgeezer: http://delicious-fruit.com/ratings/game_details.php?id=12455
+Jtool by patrickgh3: http://www.iwannacommunity.com/forum/index.php?topic=1964.0
