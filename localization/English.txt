@@ -21,6 +21,8 @@ menu_forum_thread=Open forum thread
 
 convert_success=Successfully saved room as %s.\nRight click on Rooms -> "Add existing room" to import it.
 
+gmksplit_working=Gmksplit working...
+
 error_top_field_empty=One of the top fields is empty.
 error_object_no_name=An enabled object has no name.
 error_nonexistent_object=Can't find object "%s" in the project.

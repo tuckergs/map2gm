@@ -10,3 +10,9 @@ not in repo
 prefs
 lang
 errorlog.txt
+
+# gmksplitter binaries and stuff
+gmksplitter
+
+# folder where gmksplit outputs to
+temp_gmksplit

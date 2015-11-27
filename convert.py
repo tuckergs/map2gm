@@ -1,6 +1,7 @@
 # actual conversion logic
 
 import os, sys, random, math, xml.etree.ElementTree as ET
+import util
 
 object_ids = {
     'block':(2,1),
@@ -82,12 +83,7 @@ def convert(project_path, template_room_path, map_path, chosen_names):
     output_room_name = 'rMapImport_%s' % os.path.split(map_path)[1].split('.')[0]
     valid_chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'
     output_room_name = ''.join([char if char in valid_chars else '_' for char in output_room_name])
-    # determine if application is a script file or frozen exe
-    if getattr(sys, 'frozen', False):
-        application_path = os.path.dirname(sys.executable)
-    elif __file__:
-        application_path = os.path.dirname(__file__)
-    output_room_path = os.path.join(application_path, output_room_name+'.room.gmx')
+    output_room_path = os.path.join(util.get_application_path(), output_room_name+'.room.gmx')
 
     # create a new room file (based on template) with the instances added
     output_room_tree = ET.parse(template_room_path)

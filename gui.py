@@ -1,8 +1,8 @@
 # window for user input
 
-import sys, os, traceback, webbrowser, tkinter as tk
+import sys, os, subprocess, shutil, traceback, webbrowser, tkinter as tk
 from tkinter import filedialog, messagebox
-import localize
+import localize, util
 
 def loc(key):
     return localize.loc(key)
@@ -15,18 +15,19 @@ def update_object_widgets(check_enabled, entry, button):
     entry.configure(state=state)
     button.configure(state=state)
 
-def ask_path(entry, dialogtitle, filetypes, initialdir_func, format_func):
+def ask_path(entry, dialogtitle, filetypes, initialdir_func, format_func, changed_func):
     path = filedialog.askopenfilename(filetypes=filetypes,title=dialogtitle,initialdir=initialdir_func())
     if path != '':
         path = format_func(path)
         entry.delete(0, tk.END)
         entry.insert(0, path)
         entry.xview(tk.END)
+        changed_func(path)
 
-def row_askpath(row, labeltext, dialogtitle, filetypes, initialdir_func, format_func):
+def row_askpath(row, labeltext, dialogtitle, filetypes, initialdir_func, format_func, changed_func):
     label = tk.Label(root,text=labeltext)
     entry = tk.Entry(root)
-    cmd = lambda: ask_path(entry, dialogtitle, filetypes, initialdir_func, format_func)
+    cmd = lambda: ask_path(entry, dialogtitle, filetypes, initialdir_func, format_func, changed_func)
     button = tk.Button(root,image=folder_image,width=35,height=25,command=cmd)
     label.grid(row=row,column=0,sticky=tk.E)
     entry.grid(row=row,column=1,sticky=tk.EW)
@@ -89,22 +90,40 @@ def run(submit_func):
     root = tk.Tk()
     folder_image = tk.Image('photo', file='images/folder.png')
 
-    # window contents
+    # top three input fields
     current_row = 0
     labeltext = loc('label_project')
     dialogtitle = loc('open_project')
-    filetypes = [('GameMaker: Studio project', '.project.gmx')]
+    filetypes = [('GameMaker Studio, 8.1, or 8.0 project', '*.gm*')]
     initialdir_func = lambda: ''
     format_func = lambda path: path
-    project_textbox = row_askpath(current_row, labeltext, dialogtitle, filetypes, initialdir_func, format_func)
+
+    def project_changed(path):
+        filetype = path.split('.')[-1]
+        if filetype == 'gm81' or filetype == 'gmk':
+            popup = tk.Toplevel()
+            popup.resizable(False, False)
+            icon_image = tk.Image('photo', file='images/icon.png')
+            popup.tk.call('wm','iconphoto',popup._w,icon_image)
+            label = tk.Label(popup, text=loc('gmksplit_working'))
+            label.grid(padx=30, pady=30)
+            popup.update()
+
+            shutil.rmtree(os.path.join(util.get_application_path(), 'temp_gmksplit'))
+            subprocess.call(os.path.join(util.get_application_path(), 'gmksplitter\\gmksplit.exe "%s" temp_gmksplit' % path))
+
+            popup.destroy()
+
+    changed_func = project_changed
+    project_textbox = row_askpath(current_row, labeltext, dialogtitle, filetypes, initialdir_func, format_func, changed_func)
 
     current_row += 1
     labeltext = loc('label_template_room')
     dialogtitle = loc('open_template_room')
-    filetypes = [('GameMaker: Studio room', '.room.gmx')]
+    filetypes = [('GameMaker: Studio room', '*.room.gmx')]
     initialdir_func = lambda: os.path.join(os.path.split(project_textbox.get())[0],'rooms')
     format_func = lambda path: os.path.split(path)[1].split('.')[0]
-    templateroom_textbox = row_askpath(current_row, labeltext, dialogtitle, filetypes, initialdir_func, format_func)
+    templateroom_textbox = row_askpath(current_row, labeltext, dialogtitle, filetypes, initialdir_func, format_func, changed_func)
 
     current_row += 1
     labeltext = loc('label_map')
@@ -112,8 +131,10 @@ def run(submit_func):
     filetypes = [('Jtool or Record My Jumps map', '*.*map')]
     initialdir_func = lambda: ''
     format_func = lambda path: path
-    map_textbox = row_askpath(current_row, labeltext, dialogtitle, filetypes, initialdir_func, format_func)
+    changed_func = lambda path: None
+    map_textbox = row_askpath(current_row, labeltext, dialogtitle, filetypes, initialdir_func, format_func, changed_func)
 
+    # object input fields
     object_names = [
         'block',
         'spikeup',
@@ -180,6 +201,7 @@ def run(submit_func):
     canvas.config(yscrollcommand=vbar.set)
     canvas.pack(side=tk.LEFT,expand=True,fill=tk.BOTH,pady=20)
 
+    # convert button
     current_row += 1
     filler_label = tk.Label(root)
     filler_label.grid(row=current_row,column=0,columnspan=2,sticky=tk.NSEW)
@@ -221,6 +243,9 @@ def run(submit_func):
     languagemenu.add_command(label='日本語 (プログラームを再起動)', command=lambda: change_language('Japanese'), state=tk.DISABLED if localize.language == 'Japanese' else tk.NORMAL)
     optionsmenu.add_cascade(label=loc('menu_language'), menu=languagemenu)
     root.config(menu=menubar)
+
+    # delete gmksplit temp folder upon start
+    shutil.rmtree(os.path.join(util.get_application_path(), 'temp_gmksplit'))
 
     # configure window and enter its main loop
     root.update()
