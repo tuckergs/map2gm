@@ -12,8 +12,11 @@ def delete_temp_gmksplit_if_necessary():
     if os.path.exists(temp_gmksplit_path):
         shutil.rmtree(temp_gmksplit_path)
 
+def gmksplit_decompose(project_path):
+    delete_temp_gmksplit_if_necessary()
+    subprocess.call(os.path.join(util.get_application_path(), 'gmksplitter\\gmksplit.exe "%s" temp_gmksplit' % project_path))
+
 def call_func_loading_popup(func, text):
-    # TODO: look into making the position of popup on top of root window
     popup = tk.Toplevel()
     popup.wm_title('')
     popup.resizable(False, False)
@@ -22,13 +25,12 @@ def call_func_loading_popup(func, text):
     label = tk.Label(popup, text=text)
     label.grid(padx=30, pady=30)
 
+    x = root.winfo_x() + 50
+    y = root.winfo_y() + 50
+    popup.geometry('+%d+%d' % (x, y))
     popup.update()
     func()
     popup.destroy()
-
-def gmksplit_decompose(project_path):
-    delete_temp_gmksplit_if_necessary()
-    subprocess.call(os.path.join(util.get_application_path(), 'gmksplitter\\gmksplit.exe "%s" temp_gmksplit' % project_path))
 
 def update_object_widgets(check_enabled, entry, button):
     if check_enabled:
@@ -149,7 +151,7 @@ def submit(submit_function, convert_button, *args):
         message = submit_function(*args)
     except:
         #TODO: localize
-        message = 'There was an error. Please tell Patrick about this.\n%s' % traceback.format_exc()
+        message = loc('python_error') + '\n' + traceback.format_exc()
         traceback.print_exc()
 
     convert_button.config(text=loc('button_convert') + '  ')
@@ -159,28 +161,25 @@ def submit(submit_function, convert_button, *args):
 def run(submit_func):
     # init stuff
     global root, folder_image
-
     root = tk.Tk()
     folder_image = tk.Image('photo', file='images/folder.png')
 
     # top three input fields
     current_row = 0
+    labeltext = loc('label_map')
+    map_textbox, map_button = entry_button_row(current_row, labeltext)
+
+    current_row += 1
     labeltext = loc('label_project')
     project_textbox, project_button = entry_button_row(current_row, labeltext)
-    button_command = lambda: project_row_clicked(project_textbox, project_textbox)
-    project_button.config(command=button_command)
 
     current_row += 1
     labeltext = loc('label_template_room')
     template_textbox, template_button = entry_button_row(current_row, labeltext)
-    button_command2 = lambda: template_row_clicked(template_textbox, project_textbox)
-    template_button.config(command=button_command2)#TODO: see if it works without the 2
 
-    current_row += 1
-    labeltext = loc('label_map')
-    map_textbox, map_button = entry_button_row(current_row, labeltext)
-    button_command3 = lambda: map_row_clicked(map_textbox, project_textbox)
-    map_button.config(command=button_command3)#TODO: see if it works without the 3
+    map_button.config(command=lambda: map_row_clicked(map_textbox, project_textbox))
+    template_button.config(command=lambda: template_row_clicked(template_textbox, project_textbox))
+    project_button.config(command=lambda: project_row_clicked(project_textbox, project_textbox))
 
     # object input fields
     current_row += 1
@@ -257,6 +256,8 @@ def run(submit_func):
                     var.set(int(checked))
                     update_object_widgets(var.get(), entry, button)
 
+    delete_temp_gmksplit_if_necessary()
+
     # menu bar
     menubar = tk.Menu(root)
     optionsmenu = tk.Menu(menubar, tearoff=False)
@@ -280,8 +281,4 @@ def run(submit_func):
     root.resizable(True, True)
     root.wm_title(loc('title'))
     root.tk.call('wm','iconphoto',root._w,icon_image)
-    def on_closing():
-        call_func_loading_popup(delete_temp_gmksplit_if_necessary, loc('popup_removing_temp_files'))
-        root.destroy()
-    root.protocol('WM_DELETE_WINDOW', on_closing)
     root.mainloop()

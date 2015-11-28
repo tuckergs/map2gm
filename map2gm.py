@@ -9,34 +9,36 @@ def loc(key):
 # object_inputs is a map: {object_name: (gm_object_name, enabled)}
 def submitted(project_path, template_room_name, map_path, object_inputs):
 
-    project_extension = project_path.split('.')[-1]
-
     # input sanitization
-    if project_path == '' or template_room_name == '' or map_path == '':
-        return loc('error_top_field_empty')
+    if project_path == '':
+        return loc('project_empty')
+    if template_room_name == '':
+        return loc('template_room_empty')
+    if map_path == '':
+        return loc('map_empty')
+
     if not os.path.exists(project_path):
-        # TODO localize
-        return 'project does not exist'
-    if not os.path.exists(map_path):
-        # TODO localize
-        return 'map does not exist'
+        return loc('project_nonexistent')
+    project_extension = project_path.split('.')[-1]
     if project_extension == 'gmx':
         template_room_path = os.path.join(os.path.split(project_path)[0], 'rooms', template_room_name+'.room.gmx')
     else:
         template_room_path = os.path.join(util.get_application_path(), 'temp_gmksplit', 'Rooms', template_room_name+'.xml')
     if not os.path.exists(template_room_path):
-        # TODO localize
-        return 'template room does not exist'
+        return loc('template_room_nonexistent')
+    if not os.path.exists(map_path):
+        return loc('map_nonexistent')
+
     for objectname, enabled in object_inputs.values():
         if enabled:
             if objectname == '':
-                return loc('error_object_no_name')
+                return loc('enabled_object_no_name')
             if project_extension == 'gmx':
                 object_path = os.path.join(os.path.split(project_path)[0], 'objects', objectname + '.object.gmx')
             else:
                 object_path = os.path.join(util.get_application_path(), 'temp_gmksplit', 'Objects', objectname +'.xml')
             if not os.path.exists(object_path):
-                return loc('error_nonexistent_object') % objectname
+                return loc('object_nonexistent') % objectname
 
     # build dict of object names that were enabled
     chosen_object_names = {}
@@ -44,7 +46,7 @@ def submitted(project_path, template_room_name, map_path, object_inputs):
         if enabled:
             chosen_object_names[object_name] = gm_object_name
 
-    output_room_name = convert.convert(project_path, template_room_path, map_path, chosen_object_names)
+    conversion_output_filename = convert.convert(project_path, template_room_path, map_path, chosen_object_names)
 
     # save preferences
     with open('prefs', 'w') as f:
@@ -53,7 +55,11 @@ def submitted(project_path, template_room_name, map_path, object_inputs):
         for object_name, (gm_object_name, enabled) in sorted(object_inputs.items()):
             f.write('%s|%s|%i\n' % (object_name, gm_object_name, enabled))
 
-    return loc('convert_success') % output_room_name
+    if project_extension == 'gmx':
+        base = loc('convert_success_gmx')
+    else:
+        base = loc('convert_success_gmk')
+    return base % conversion_output_filename
 
 # prompt and load language
 if os.path.exists('lang'):

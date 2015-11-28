@@ -4,7 +4,6 @@ label_project=Project:
 label_template_room=Template room:
 label_map=Map:
 label_object_enabled=Enabled
-
 open_project=Select Project
 open_template_room=Select Template Room
 open_map=Select Map
@@ -19,11 +18,16 @@ menu_instructions=Open instructions
 menu_readme=Open readme
 menu_forum_thread=Open forum thread
 
-convert_success=Successfully saved room as %s.\nRight click on Rooms -> "Add existing room" to import it.
-
+convert_success_gmx=Successfully saved room as %s.\nTo import it, right click on the Rooms folder and select "Add existing room".
+convert_success_gmk=Successfully saved new project as %s.
 gmksplit_working=Gmksplit working...
-popup_removing_temp_files=Removing temp files...
 
-error_top_field_empty=One of the top fields is empty.
-error_object_no_name=An enabled object has no name.
-error_nonexistent_object=Can't find object "%s" in the project.
+project_empty=Please select a project.
+template_room_empty=Please select a template room.
+map_empty=Please select a map.
+project_nonexsistent=The specified project file does not exist.
+template_room_nonexistent=The specified template room does not exist.
+map_nonexistent=The specified map does not exist.
+enabled_object_no_name=An enabled object has no name.
+object_nonexistent=Can't find object "%s" in the project.
+python_error=There was a Python error. Please contact Patrick with a screenshot of this traceback, so he can fix it. Thank you.
