@@ -1,3 +1,5 @@
+# stores dictionary of localized strings
+
 dict = {}
 
 def load(lang):

@@ -1,12 +1,15 @@
 # entry point, input sanitization, general controller stuff
 
 import os
-import gui, convert, localize, util
+# map2gm modules
+import gui
+import convert
+import localize
+import util
 
 def loc(key):
     return localize.loc(key)
 
-# object_inputs is a map: {object_name: (gm_object_name, enabled)}
 def submitted(project_path, template_room_name, map_path, object_inputs):
 
     # input sanitization

@@ -1,4 +1,7 @@
-import os, sys
+# contains generic utility functions
+
+import os
+import sys
 
 def get_application_path():
     if getattr(sys, 'frozen', False):

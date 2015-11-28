@@ -1,6 +1,12 @@
-# actual conversion logic
+# actual conversion logic - parses map files, outputs GM files
 
-import os, sys, random, math, string, subprocess, lxml.etree as ET
+import os
+import sys
+import random
+import math
+import subprocess
+import lxml.etree as ET
+# map2gm modules
 import util
 
 object_ids = {
@@ -30,8 +36,6 @@ object_ids = {
     }
 
 def convert(project_path, template_room_path, map_path, chosen_names):
-
-    project_extension = project_path.split('.')[-1]
 
     # build conversion dicts according to chosen object names
     rmj_to_objectname = {}
@@ -85,6 +89,7 @@ def convert(project_path, template_room_path, map_path, chosen_names):
     output_room_name = 'rMapImport_%s' % os.path.split(map_path)[1].split('.')[0]
     valid_chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'
     output_room_name = ''.join([char if char in valid_chars else '_' for char in output_room_name])
+    project_extension = project_path.split('.')[-1]
     if project_extension == 'gmx':
         output_room_path = os.path.join(util.get_application_path(), output_room_name+'.room.gmx')
     else:
@@ -119,7 +124,7 @@ def convert(project_path, template_room_path, map_path, chosen_names):
             instances_element.append(inst_elt)
     output_room_tree.write(output_room_path, pretty_print = True)
 
-    # if not studio project, add room to room list and recompose project file
+    # if gmksplit project, add room to room list and recompose project file
     if project_extension != 'gmx':
         room_resources_path = os.path.join(util.get_application_path(), 'temp_gmksplit', 'Rooms', '_resources.list.xml')
         parser = ET.XMLParser(remove_blank_text=True)
@@ -133,7 +138,7 @@ def convert(project_path, template_room_path, map_path, chosen_names):
             room_resources_tree.write(room_resources_path, pretty_print = True)
 
         output_project_name = os.path.split(project_path)[1].split('.')[-2]
-        output_project_name += '_' + ''.join([random.choice(string.ascii_lowercase) for i in range(5)]) + '.' + project_extension
+        output_project_name += '_' + ''.join([random.choice('abcdefghijklmnopqrstuvwxyz') for i in range(5)]) + '.' + project_extension
         output_project_path = os.path.join(util.get_application_path(), output_project_name)
         subprocess.call(os.path.join(util.get_application_path(), 'gmksplitter\\gmksplit.exe temp_gmksplit "%s"' % output_project_path))
 

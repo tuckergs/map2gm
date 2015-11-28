@@ -1,8 +1,16 @@
-# window for user input
+# controls window for user input
 
-import sys, os, subprocess, shutil, traceback, webbrowser, tkinter as tk
+import sys
+import os
+import subprocess
+import shutil
+import traceback
+import webbrowser
+import tkinter as tk
 from tkinter import filedialog, messagebox
-import localize, util
+# map2gm modules
+import localize
+import util
 
 def loc(key):
     return localize.loc(key)
@@ -150,7 +158,6 @@ def submit(submit_function, convert_button, *args):
     try:
         message = submit_function(*args)
     except:
-        #TODO: localize
         message = loc('python_error') + '\n' + traceback.format_exc()
         traceback.print_exc()
 
