@@ -3,7 +3,7 @@
 |    _|___    Needle Map to GM Converter
 |___| /   |
     | \___|   by patrickgh3
-    |_____|
+--> |_____|
 
 This is a tool that automates transferring over objects from RMJ and Jtool maps
 into GameMaker. I thought that this tool would be very useful for making
