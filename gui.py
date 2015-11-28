@@ -7,6 +7,11 @@ import localize, util
 def loc(key):
     return localize.loc(key)
 
+def delete_temp_gmksplit_if_necessary():
+    temp_gmksplit_path = os.path.join(util.get_application_path(), 'temp_gmksplit')
+    if os.path.exists(temp_gmksplit_path):
+        shutil.rmtree(temp_gmksplit_path)
+
 def update_object_widgets(check_enabled, entry, button):
     if check_enabled:
         state = tk.NORMAL
@@ -15,24 +20,63 @@ def update_object_widgets(check_enabled, entry, button):
     entry.configure(state=state)
     button.configure(state=state)
 
-def ask_path(entry, dialogtitle, filetypes, initialdir_func, format_func, changed_func):
-    path = filedialog.askopenfilename(filetypes=filetypes,title=dialogtitle,initialdir=initialdir_func())
+def ask_path(entry, dialogtitle, filetypes, initialdir, format_func):
+    path = filedialog.askopenfilename(filetypes=filetypes,title=dialogtitle,initialdir=initialdir)
     if path != '':
         path = format_func(path)
         entry.delete(0, tk.END)
         entry.insert(0, path)
         entry.xview(tk.END)
-        changed_func(path)
 
-def row_askpath(row, labeltext, dialogtitle, filetypes, initialdir_func, format_func, changed_func):
+def project_row_clicked(entry, project_entry):
+    dialogtitle = loc('open_project')
+    filetypes = [('GameMaker Studio, 8.1, or 8.0 project', '*.gm*')]
+    initialdir = ''
+    format_func = lambda path: path
+    ask_path(entry, dialogtitle, filetypes, initialdir, format_func)
+
+    filetype = entry.get().split('.')[-1]
+    if filetype != 'gmx':
+        popup = tk.Toplevel()
+        popup.wm_title('')
+        popup.resizable(False, False)
+        icon_image = tk.Image('photo', file='images/icon.png')
+        popup.tk.call('wm','iconphoto',popup._w,icon_image)
+        label = tk.Label(popup, text=loc('gmksplit_working'))
+        label.grid(padx=30, pady=30)
+        popup.update()
+
+        delete_temp_gmksplit_if_necessary()
+        subprocess.call(os.path.join(util.get_application_path(), 'gmksplitter\\gmksplit.exe "%s" temp_gmksplit' % entry.get()))
+
+        popup.destroy()
+
+def template_row_clicked(entry, project_entry):
+    filetype = project_entry.get().split('.')[-1]
+    if filetype == 'gmx':
+        filetypes = [('GameMaker: Studio room', '*.room.gmx')]
+        initialdir = os.path.join(os.path.split(project_entry.get())[0],'rooms')
+    else:
+        filetypes = [('Gmksplit room', '*.xml')]
+        initialdir = os.path.join(util.get_application_path(),'temp_gmksplit','Rooms')
+    dialogtitle = loc('open_template_room')
+    format_func = lambda path: os.path.split(path)[1].split('.')[0]
+    ask_path(entry, dialogtitle, filetypes, initialdir, format_func)
+
+def map_row_clicked(entry, project_entry):
+    print('map row clicked')
+
+def object_row_clicked(entry, project_entry):
+    print('object row clicked')
+
+def entry_button_row(row, labeltext):
     label = tk.Label(root,text=labeltext)
     entry = tk.Entry(root)
-    cmd = lambda: ask_path(entry, dialogtitle, filetypes, initialdir_func, format_func, changed_func)
-    button = tk.Button(root,image=folder_image,width=35,height=25,command=cmd)
+    button = tk.Button(root,image=folder_image,width=35,height=25)
     label.grid(row=row,column=0,sticky=tk.E)
     entry.grid(row=row,column=1,sticky=tk.EW)
     button.grid(row=row,column=2,sticky=tk.W)
-    return entry
+    return (entry, button)
 
 def ask_language():
     global chosen
@@ -93,46 +137,21 @@ def run(submit_func):
     # top three input fields
     current_row = 0
     labeltext = loc('label_project')
-    dialogtitle = loc('open_project')
-    filetypes = [('GameMaker Studio, 8.1, or 8.0 project', '*.gm*')]
-    initialdir_func = lambda: ''
-    format_func = lambda path: path
-
-    def project_changed(path):
-        filetype = path.split('.')[-1]
-        if filetype == 'gm81' or filetype == 'gmk':
-            popup = tk.Toplevel()
-            popup.resizable(False, False)
-            icon_image = tk.Image('photo', file='images/icon.png')
-            popup.tk.call('wm','iconphoto',popup._w,icon_image)
-            label = tk.Label(popup, text=loc('gmksplit_working'))
-            label.grid(padx=30, pady=30)
-            popup.update()
-
-            shutil.rmtree(os.path.join(util.get_application_path(), 'temp_gmksplit'))
-            subprocess.call(os.path.join(util.get_application_path(), 'gmksplitter\\gmksplit.exe "%s" temp_gmksplit' % path))
-
-            popup.destroy()
-
-    changed_func = project_changed
-    project_textbox = row_askpath(current_row, labeltext, dialogtitle, filetypes, initialdir_func, format_func, changed_func)
+    project_textbox, project_button = entry_button_row(current_row, labeltext)
+    button_command = lambda: project_row_clicked(project_textbox, project_textbox)
+    project_button.config(command=button_command)
 
     current_row += 1
     labeltext = loc('label_template_room')
-    dialogtitle = loc('open_template_room')
-    filetypes = [('GameMaker: Studio room', '*.room.gmx')]
-    initialdir_func = lambda: os.path.join(os.path.split(project_textbox.get())[0],'rooms')
-    format_func = lambda path: os.path.split(path)[1].split('.')[0]
-    templateroom_textbox = row_askpath(current_row, labeltext, dialogtitle, filetypes, initialdir_func, format_func, changed_func)
+    template_textbox, template_button = entry_button_row(current_row, labeltext)
+    button_command2 = lambda: template_row_clicked(template_textbox, project_textbox)
+    template_button.config(command=button_command2)#TODO: see if it works without the 2
 
     current_row += 1
     labeltext = loc('label_map')
-    dialogtitle = loc('open_map')
-    filetypes = [('Jtool or Record My Jumps map', '*.*map')]
-    initialdir_func = lambda: ''
-    format_func = lambda path: path
-    changed_func = lambda path: None
-    map_textbox = row_askpath(current_row, labeltext, dialogtitle, filetypes, initialdir_func, format_func, changed_func)
+    map_textbox, map_button = entry_button_row(current_row, labeltext)
+    button_command3 = lambda: map_row_clicked(map_textbox, project_textbox)
+    map_button.config(command=button_command3)#TODO: see if it works without the 3
 
     # object input fields
     object_names = [
@@ -182,7 +201,7 @@ def run(submit_func):
 
         initialdir_func = lambda: os.path.join(os.path.split(project_textbox.get())[0],'objects')
         format_func = lambda path: os.path.split(path)[1].split('.')[0]
-        cmd = lambda entry=e,ifunc=initialdir_func,ffunc=format_func: ask_path(entry, loc('open_object'), [('GM:S object', '.object.gmx')], ifunc, ffunc)
+        cmd = lambda: object_row_clicked(e, project_textbox)
         b = tk.Button(root,image=folder_image,command=cmd,state=tk.DISABLED)
 
         canvas.create_window((190,0+objectrow*objectrowheight),anchor=tk.W,window=b,width=40,height=30)
@@ -207,7 +226,7 @@ def run(submit_func):
     filler_label.grid(row=current_row,column=0,columnspan=2,sticky=tk.NSEW)
     icon_image = tk.Image('photo', file='images/icon.png')
     convert_button = tk.Button(root,text=loc('button_convert') + '  ',image=icon_image,compound=tk.RIGHT,width=150)
-    cmd = lambda: submit(submit_func, convert_button, project_textbox.get(), templateroom_textbox.get(), map_textbox.get(), {k: (v[0].get(),v[1].get()) for (k,v) in object_widgets.items()})
+    cmd = lambda: submit(submit_func, convert_button, project_textbox.get(), template_textbox.get(), map_textbox.get(), {k: (v[0].get(),v[1].get()) for (k,v) in object_widgets.items()})
     convert_button.configure(command=cmd)
     convert_button.grid(row=current_row,column=1,columnspan=2,sticky=tk.SE)
 
@@ -219,8 +238,8 @@ def run(submit_func):
                 args += [''] * (3 - len(args))
                 type, value, checked = args
                 if type == 'template':
-                    templateroom_textbox.insert(0, value)
-                    templateroom_textbox.xview(tk.END)
+                    template_textbox.insert(0, value)
+                    template_textbox.xview(tk.END)
                 elif type == 'project':
                     project_textbox.insert(0, value)
                     project_textbox.xview(tk.END)
@@ -244,8 +263,7 @@ def run(submit_func):
     optionsmenu.add_cascade(label=loc('menu_language'), menu=languagemenu)
     root.config(menu=menubar)
 
-    # delete gmksplit temp folder upon start
-    shutil.rmtree(os.path.join(util.get_application_path(), 'temp_gmksplit'))
+    delete_temp_gmksplit_if_necessary()
 
     # configure window and enter its main loop
     root.update()
