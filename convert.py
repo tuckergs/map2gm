@@ -1,6 +1,6 @@
 # actual conversion logic
 
-import os, sys, random, math, xml.etree.ElementTree as ET
+import os, sys, random, math, string, subprocess, xml.etree.ElementTree as ET
 import util
 
 object_ids = {
@@ -30,6 +30,8 @@ object_ids = {
     }
 
 def convert(project_path, template_room_path, map_path, chosen_names):
+
+    project_extension = project_path.split('.')[-1]
 
     # build conversion dicts according to chosen object names
     rmj_to_objectname = {}
@@ -83,25 +85,52 @@ def convert(project_path, template_room_path, map_path, chosen_names):
     output_room_name = 'rMapImport_%s' % os.path.split(map_path)[1].split('.')[0]
     valid_chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'
     output_room_name = ''.join([char if char in valid_chars else '_' for char in output_room_name])
-    output_room_path = os.path.join(util.get_application_path(), output_room_name+'.room.gmx')
+    if project_extension == 'gmx':
+        output_room_path = os.path.join(util.get_application_path(), output_room_name+'.room.gmx')
+    else:
+        output_room_path = os.path.join(util.get_application_path(), 'temp_gmksplit', 'Rooms', output_room_name+'.xml')
 
     # create a new room file (based on template) with the instances added
     output_room_tree = ET.parse(template_room_path)
     instances_element = output_room_tree.getroot().find('instances')
     for x, y, name in map_instances:
-        attrib = {}
-        attrib['x'] = x
-        attrib['y'] = y
-        attrib['objName'] = name
-        attrib['locked'] = '0'
-        attrib['code'] = ''
-        attrib['scaleX'] = '1'
-        attrib['scaleY'] = '1'
-        attrib['colour'] = '4294967295'
-        attrib['rotation'] = '0'
-        attrib['name'] = 'inst_'+''.join([random.choice('0123456789ABCDEF') for i in range(8)])
-        new_element = ET.Element('instance', attrib=attrib)
-        instances_element.append(new_element)
-        output_room_tree.write(output_room_path)
+        if project_extension == 'gmx':
+            attrib = {}
+            attrib['x'] = x
+            attrib['y'] = y
+            attrib['objName'] = name
+            attrib['locked'] = '0'
+            attrib['code'] = ''
+            attrib['scaleX'] = '1'
+            attrib['scaleY'] = '1'
+            attrib['colour'] = '4294967295'
+            attrib['rotation'] = '0'
+            attrib['name'] = 'inst_'+''.join([random.choice('0123456789ABCDEF') for i in range(8)])
+            ET.SubElement(instances_element, 'instance', attrib=attrib)
+        else:
+            inst_elt = ET.Element('instance')
+            obj_elt = ET.SubElement(inst_elt, 'object')
+            obj_elt.text = name
+            ET.SubElement(inst_elt, 'position', x=x, y=y)
+            ET.SubElement(inst_elt, 'creationCode')
+            locked_elt = ET.SubElement(inst_elt, 'locked')
+            locked_elt.text = 'false'
+            instances_element.append(inst_elt)
+    output_room_tree.write(output_room_path)
 
-    return output_room_name
+    # if not studio project, add room to room list and recompose project file
+    if project_extension != 'gmx':
+        room_resources_path = os.path.join(util.get_application_path(), 'temp_gmksplit', 'Rooms', '_resources.list.xml')
+        room_resources_tree = ET.parse(room_resources_path)
+        ET.SubElement(room_resources_tree.getroot(), 'resource', name=output_room_name, type='RESOURCE')
+        room_resources_tree.write(room_resources_path)
+
+        output_project_name = os.path.split(project_path)[1].split('.')[-2]
+        output_project_name += '_' + ''.join([random.choice(string.ascii_lowercase) for i in range(5)]) + '.' + project_extension
+        output_project_path = os.path.join(util.get_application_path(), output_project_name)
+        subprocess.call(os.path.join(util.get_application_path(), 'gmksplitter\\gmksplit.exe temp_gmksplit "%s"' % output_project_path))
+
+    if project_extension == 'gmx':
+        return output_room_name
+    else:
+        return output_project_name

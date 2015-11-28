@@ -12,6 +12,24 @@ def delete_temp_gmksplit_if_necessary():
     if os.path.exists(temp_gmksplit_path):
         shutil.rmtree(temp_gmksplit_path)
 
+def call_func_loading_popup(func, text):
+    # TODO: look into making the position of popup on top of root window
+    popup = tk.Toplevel()
+    popup.wm_title('')
+    popup.resizable(False, False)
+    icon_image = tk.Image('photo', file='images/icon.png')
+    popup.tk.call('wm','iconphoto',popup._w,icon_image)
+    label = tk.Label(popup, text=text)
+    label.grid(padx=30, pady=30)
+
+    popup.update()
+    func()
+    popup.destroy()
+
+def gmksplit_decompose(project_path):
+    delete_temp_gmksplit_if_necessary()
+    subprocess.call(os.path.join(util.get_application_path(), 'gmksplitter\\gmksplit.exe "%s" temp_gmksplit' % project_path))
+
 def update_object_widgets(check_enabled, entry, button):
     if check_enabled:
         state = tk.NORMAL
@@ -31,26 +49,15 @@ def ask_path(entry, dialogtitle, filetypes, initialdir, format_func):
 def project_row_clicked(entry, project_entry):
     dialogtitle = loc('open_project')
     filetypes = [('GameMaker Studio, 8.1, or 8.0 project', '*.gm*')]
-    initialdir = ''
+    initialdir = util.get_application_path()
     format_func = lambda path: path
+
+    lastpath = entry.get()
     ask_path(entry, dialogtitle, filetypes, initialdir, format_func)
 
     filetype = entry.get().split('.')[-1]
-    if filetype != 'gmx':
-        # TODO: look into making the position of popup on top of root window
-        popup = tk.Toplevel()
-        popup.wm_title('')
-        popup.resizable(False, False)
-        icon_image = tk.Image('photo', file='images/icon.png')
-        popup.tk.call('wm','iconphoto',popup._w,icon_image)
-        label = tk.Label(popup, text=loc('gmksplit_working'))
-        label.grid(padx=30, pady=30)
-        popup.update()
-
-        delete_temp_gmksplit_if_necessary()
-        subprocess.call(os.path.join(util.get_application_path(), 'gmksplitter\\gmksplit.exe "%s" temp_gmksplit' % entry.get()))
-
-        popup.destroy()
+    if filetype != 'gmx' and entry.get() != lastpath and os.path.exists(entry.get()):
+        call_func_loading_popup(lambda: gmksplit_decompose(entry.get()), loc('gmksplit_working'))
 
 def template_row_clicked(entry, project_entry):
     filetype = project_entry.get().split('.')[-1]
@@ -60,6 +67,8 @@ def template_row_clicked(entry, project_entry):
     else:
         filetypes = [('Gmksplit room', '*.xml')]
         initialdir = os.path.join(util.get_application_path(),'temp_gmksplit','Rooms')
+        if not os.path.exists(initialdir):
+            call_func_loading_popup(lambda: gmksplit_decompose(project_entry.get()), loc('gmksplit_working'))
     dialogtitle = loc('open_template_room')
     format_func = lambda path: os.path.split(path)[1].split('.')[0]
     ask_path(entry, dialogtitle, filetypes, initialdir, format_func)
@@ -67,7 +76,7 @@ def template_row_clicked(entry, project_entry):
 def map_row_clicked(entry, project_entry):
     dialogtitle = loc('open_map')
     filetypes = [('Jtool or Record My Jumps map', '*.*map')]
-    initialdir = ''
+    initialdir = util.get_application_path()
     format_func = lambda path: path
     ask_path(entry, dialogtitle, filetypes, initialdir, format_func)
 
@@ -79,6 +88,8 @@ def object_row_clicked(entry, project_entry):
     else:
         filetypes = [('Gmksplit object', '*.xml')]
         initialdir = os.path.join(util.get_application_path(),'temp_gmksplit','Objects')
+        if not os.path.exists(initialdir):
+            call_func_loading_popup(lambda: gmksplit_decompose(project_entry.get()), loc('gmksplit_working'))
     dialogtitle = loc('open_object')
     format_func = lambda path: os.path.split(path)[1].split('.')[0]
     ask_path(entry, dialogtitle, filetypes, initialdir, format_func)
@@ -129,6 +140,10 @@ def show_readme():
 def submit(submit_function, convert_button, *args):
     convert_button.config(text=loc('button_convert_working') + '  ')
     root.update()
+
+    filetype = args[0].split('.')[-1]
+    if filetype != 'gmx' and not os.path.exists(os.path.join(util.get_application_path(),'temp_gmksplit')):
+        gmksplit_decompose(args[0])
 
     try:
         message = submit_function(*args)
@@ -199,7 +214,7 @@ def run(submit_func):
         e = tk.Entry(root,state=tk.DISABLED)
         canvas.create_window((60,0+objectrow*objectrowheight),anchor=tk.W,window=e,width=120)
 
-        cmd = lambda: object_row_clicked(e, project_textbox)
+        cmd = lambda entry=e: object_row_clicked(entry, project_textbox)
         b = tk.Button(root,image=folder_image,command=cmd,state=tk.DISABLED)
         canvas.create_window((190,0+objectrow*objectrowheight),anchor=tk.W,window=b,width=40,height=30)
 
@@ -255,8 +270,6 @@ def run(submit_func):
     optionsmenu.add_cascade(label=loc('menu_language'), menu=languagemenu)
     root.config(menu=menubar)
 
-    delete_temp_gmksplit_if_necessary()
-
     # configure window and enter its main loop
     root.update()
     root.minsize(root.winfo_width(), root.winfo_height())
@@ -267,4 +280,8 @@ def run(submit_func):
     root.resizable(True, True)
     root.wm_title(loc('title'))
     root.tk.call('wm','iconphoto',root._w,icon_image)
+    def on_closing():
+        call_func_loading_popup(delete_temp_gmksplit_if_necessary, loc('popup_removing_temp_files'))
+        root.destroy()
+    root.protocol('WM_DELETE_WINDOW', on_closing)
     root.mainloop()

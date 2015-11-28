@@ -1,13 +1,15 @@
 # entry point, input sanitization, general controller stuff
 
 import os
-import gui, convert, localize
+import gui, convert, localize, util
 
 def loc(key):
     return localize.loc(key)
 
 # object_inputs is a map: {object_name: (gm_object_name, enabled)}
 def submitted(project_path, template_room_name, map_path, object_inputs):
+
+    project_extension = project_path.split('.')[-1]
 
     # input sanitization
     if project_path == '' or template_room_name == '' or map_path == '':
@@ -18,7 +20,10 @@ def submitted(project_path, template_room_name, map_path, object_inputs):
     if not os.path.exists(map_path):
         # TODO localize
         return 'map does not exist'
-    template_room_path = os.path.join(os.path.split(project_path)[0], 'rooms', template_room_name+'.room.gmx')
+    if project_extension == 'gmx':
+        template_room_path = os.path.join(os.path.split(project_path)[0], 'rooms', template_room_name+'.room.gmx')
+    else:
+        template_room_path = os.path.join(util.get_application_path(), 'temp_gmksplit', 'Rooms', template_room_name+'.xml')
     if not os.path.exists(template_room_path):
         # TODO localize
         return 'template room does not exist'
@@ -26,8 +31,11 @@ def submitted(project_path, template_room_name, map_path, object_inputs):
         if enabled:
             if objectname == '':
                 return loc('error_object_no_name')
-            fn = os.path.join(os.path.split(project_path)[0], 'objects', objectname + '.object.gmx')
-            if not os.path.exists(fn):
+            if project_extension == 'gmx':
+                object_path = os.path.join(os.path.split(project_path)[0], 'objects', objectname + '.object.gmx')
+            else:
+                object_path = os.path.join(util.get_application_path(), 'temp_gmksplit', 'Objects', objectname +'.xml')
+            if not os.path.exists(object_path):
                 return loc('error_nonexistent_object') % objectname
 
     # build dict of object names that were enabled
