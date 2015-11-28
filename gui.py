@@ -37,6 +37,7 @@ def project_row_clicked(entry, project_entry):
 
     filetype = entry.get().split('.')[-1]
     if filetype != 'gmx':
+        # TODO: look into making the position of popup on top of root window
         popup = tk.Toplevel()
         popup.wm_title('')
         popup.resizable(False, False)
@@ -64,10 +65,23 @@ def template_row_clicked(entry, project_entry):
     ask_path(entry, dialogtitle, filetypes, initialdir, format_func)
 
 def map_row_clicked(entry, project_entry):
-    print('map row clicked')
+    dialogtitle = loc('open_map')
+    filetypes = [('Jtool or Record My Jumps map', '*.*map')]
+    initialdir = ''
+    format_func = lambda path: path
+    ask_path(entry, dialogtitle, filetypes, initialdir, format_func)
 
 def object_row_clicked(entry, project_entry):
-    print('object row clicked')
+    filetype = project_entry.get().split('.')[-1]
+    if filetype == 'gmx':
+        filetypes = [('GameMaker: Studio object', '*.object.gmx')]
+        initialdir = os.path.join(os.path.split(project_entry.get())[0],'objects')
+    else:
+        filetypes = [('Gmksplit object', '*.xml')]
+        initialdir = os.path.join(util.get_application_path(),'temp_gmksplit','Objects')
+    dialogtitle = loc('open_object')
+    format_func = lambda path: os.path.split(path)[1].split('.')[0]
+    ask_path(entry, dialogtitle, filetypes, initialdir, format_func)
 
 def entry_button_row(row, labeltext):
     label = tk.Label(root,text=labeltext)
@@ -154,71 +168,49 @@ def run(submit_func):
     map_button.config(command=button_command3)#TODO: see if it works without the 3
 
     # object input fields
+    current_row += 1
     object_names = [
-        'block',
-        'spikeup',
-        'spikeright',
-        'spikeleft',
-        'spikedown',
-        'miniblock',
-        'miniup',
-        'miniright',
-        'minileft',
-        'minidown',
-        'save',
-        'platform',
-        'water1',
-        'water2',
-        'water3',
-        'cherry',
-        'hurtblock',
-        'vineright',
-        'vineleft',
-        'jumprefresher',
-        'bulletblocker',
-        'start',
-        'warp',
+        'block','spikeup','spikeright','spikeleft','spikedown',
+        'miniblock','miniup','miniright','minileft','minidown',
+        'save','platform','water1','water2','water3','cherry','hurtblock',
+        'vineright','vineleft','jumprefresher','bulletblocker','start','warp',
         ]
     object_images = [(o,'images/%s.png'%o) for o in object_names]
     objectrowheight = 40
     frameheight = 5 * objectrowheight
     canvasheight = (len(object_images) - 1) * objectrowheight
-
-    current_row += 1
     frame = tk.Frame(root,height=frameheight)
     frame.grid(row=current_row,column=0,columnspan=3,padx=5,pady=5,sticky=tk.NS)
-    canvas = tk.Canvas(frame,scrollregion=(0,0,0,canvasheight),yscrollincrement=objectrowheight)
-    objectrow = 0
+    canvas = tk.Canvas(frame,scrollregion=(0,0,0,canvasheight),height=frameheight, width=340, yscrollincrement=objectrowheight)
+    vbar=tk.Scrollbar(frame,orient=tk.VERTICAL)
+    vbar.pack(side=tk.RIGHT,fill=tk.Y)
+    vbar.config(command=canvas.yview)
+    canvas.config(yscrollcommand=vbar.set)
+    canvas.pack(side=tk.LEFT,expand=True,fill=tk.BOTH,pady=20)
 
+    objectrow = 0
     object_widgets = {}
     for objectname, imagepath in object_images:
         photo = tk.PhotoImage(file=imagepath)
         w = tk.Label(root,image=photo)
         w.photo = photo # to prevent it from being garbage collected
         canvas.create_window((25,0+objectrow*objectrowheight),anchor=tk.CENTER,window=w)
+
         e = tk.Entry(root,state=tk.DISABLED)
         canvas.create_window((60,0+objectrow*objectrowheight),anchor=tk.W,window=e,width=120)
 
-        initialdir_func = lambda: os.path.join(os.path.split(project_textbox.get())[0],'objects')
-        format_func = lambda path: os.path.split(path)[1].split('.')[0]
         cmd = lambda: object_row_clicked(e, project_textbox)
         b = tk.Button(root,image=folder_image,command=cmd,state=tk.DISABLED)
-
         canvas.create_window((190,0+objectrow*objectrowheight),anchor=tk.W,window=b,width=40,height=30)
+
         v = tk.BooleanVar()
         v.set(False)
         cmd = lambda var=v,entry=e,button=b: update_object_widgets(var.get(),entry,button)
         c = tk.Checkbutton(root,text=loc('label_object_enabled'),variable=v,command=cmd)
         canvas.create_window((240,0+objectrow*objectrowheight),anchor=tk.W,window=c)
+
         object_widgets[objectname] = (e, v, b)
         objectrow += 1
-
-    vbar=tk.Scrollbar(frame,orient=tk.VERTICAL)
-    vbar.pack(side=tk.RIGHT,fill=tk.Y)
-    vbar.config(command=canvas.yview)
-    canvas.config(height=frameheight,width=340)
-    canvas.config(yscrollcommand=vbar.set)
-    canvas.pack(side=tk.LEFT,expand=True,fill=tk.BOTH,pady=20)
 
     # convert button
     current_row += 1
