@@ -1,6 +1,6 @@
 # actual conversion logic
 
-import os, sys, random, math, string, subprocess, xml.etree.ElementTree as ET
+import os, sys, random, math, string, subprocess, lxml.etree as ET
 import util
 
 object_ids = {
@@ -91,7 +91,8 @@ def convert(project_path, template_room_path, map_path, chosen_names):
         output_room_path = os.path.join(util.get_application_path(), 'temp_gmksplit', 'Rooms', output_room_name+'.xml')
 
     # create a new room file (based on template) with the instances added
-    output_room_tree = ET.parse(template_room_path)
+    parser = ET.XMLParser(remove_blank_text=True)
+    output_room_tree = ET.parse(template_room_path, parser)
     instances_element = output_room_tree.getroot().find('instances')
     for x, y, name in map_instances:
         if project_extension == 'gmx':
@@ -116,14 +117,20 @@ def convert(project_path, template_room_path, map_path, chosen_names):
             locked_elt = ET.SubElement(inst_elt, 'locked')
             locked_elt.text = 'false'
             instances_element.append(inst_elt)
-    output_room_tree.write(output_room_path)
+    output_room_tree.write(output_room_path, pretty_print = True)
 
     # if not studio project, add room to room list and recompose project file
     if project_extension != 'gmx':
         room_resources_path = os.path.join(util.get_application_path(), 'temp_gmksplit', 'Rooms', '_resources.list.xml')
-        room_resources_tree = ET.parse(room_resources_path)
-        ET.SubElement(room_resources_tree.getroot(), 'resource', name=output_room_name, type='RESOURCE')
-        room_resources_tree.write(room_resources_path)
+        parser = ET.XMLParser(remove_blank_text=True)
+        room_resources_tree = ET.parse(room_resources_path, parser)
+        room_already_in_resource_list = False
+        for room_element in room_resources_tree.getroot():
+            if room_element.attrib['name'] == output_room_name:
+                room_already_in_resource_list = True
+        if not room_already_in_resource_list:
+            ET.SubElement(room_resources_tree.getroot(), 'resource', name=output_room_name, type='RESOURCE')
+            room_resources_tree.write(room_resources_path, pretty_print = True)
 
         output_project_name = os.path.split(project_path)[1].split('.')[-2]
         output_project_name += '_' + ''.join([random.choice(string.ascii_lowercase) for i in range(5)]) + '.' + project_extension
