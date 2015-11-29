@@ -38,10 +38,8 @@ def submitted(project_path, template_room_name, map_path, object_inputs):
                 return loc('enabled_object_no_name')
             if project_extension == 'gmx':
                 object_path = os.path.join(os.path.split(project_path)[0], 'objects', objectname + '.object.gmx')
-            else:
-                object_path = os.path.join(util.get_application_path(), 'temp_gmksplit', 'Objects', objectname +'.xml')
-            if not os.path.exists(object_path):
-                return loc('object_nonexistent') % objectname
+                if not os.path.exists(object_path):
+                    return loc('object_nonexistent') % objectname
 
     # build dict of object names that were enabled
     chosen_object_names = {}
