@@ -143,8 +143,7 @@ def show_instructions():
     os.startfile('instructions.html')
 
 def show_readme():
-    readmes = {'English':'readme_en.txt','Japanese':'readme_jp.txt'}
-    os.startfile(readmes[localize.language])
+    os.startfile('readme.txt')
 
 def submit(submit_function, convert_button, *args):
     convert_button.config(text=loc('button_convert_working') + '  ')
@@ -271,10 +270,6 @@ def run(submit_func):
     optionsmenu.add_command(label=loc('menu_instructions'), command=show_instructions)
     optionsmenu.add_command(label=loc('menu_readme'), command=show_readme)
     optionsmenu.add_command(label=loc('menu_forum_thread'), command=lambda: webbrowser.open('https://www.bit.ly/needle-map-to-gm'))
-    languagemenu = tk.Menu(menubar, tearoff=False)
-    languagemenu.add_command(label='English (restarts program)', command=lambda: change_language('English'), state=tk.DISABLED if localize.language == 'English' else tk.NORMAL)
-    languagemenu.add_command(label='日本語 (プログラームを再起動)', command=lambda: change_language('Japanese'), state=tk.DISABLED if localize.language == 'Japanese' else tk.NORMAL)
-    optionsmenu.add_cascade(label=loc('menu_language'), menu=languagemenu)
     root.config(menu=menubar)
 
     # configure window and enter its main loop
