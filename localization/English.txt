@@ -4,10 +4,10 @@ label_project=Project:
 label_template_room=Template room:
 label_map=Map:
 label_object_enabled=Enabled
-open_project=Select Project
-open_template_room=Select Template Room
-open_map=Select Map
-open_object=Select Object
+open_project=Select project
+open_template_room=Select template room
+open_map=Select map
+open_object=Select object
 
 button_convert=Convert
 button_convert_working=Converting...
