@@ -1,6 +1,6 @@
  _____
 |     |
-|    _|___    map2gm - Needle Map to GM Converter
+|    _|___    map2gm - Needle Map to GameMaker Converter
 |___| /   |
     | \___|   by patrickgh3
 --> |_____|

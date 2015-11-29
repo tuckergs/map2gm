@@ -1,12 +1,10 @@
-RMJ to GM:S Converter
+Needle map to GameMaker converter
 ===
 
-A simple tool I made for the small but passionate community of "I wanna" game creators. I Wanna Record my Jumps (RMJ) is a tool some use to design spike jumps for their games. It has a nice interface and allows you to iterate quickly. Ultimately though, you have to manually convert your finalized design to Game Maker: Studio (GM:S) to be able to export the game, copying each object by hand, which can be quite tedious. I made this tool to automate this conversion, which will eliminate tedium and allow creators in our community to focus on creating.
+When designing intricate platforming for [guy games](http://delicious-fruit.com/), it's nice to use an editor like RMJ or Jtool to be able to quickly test and iterate on your designs. However, once you've finalized your design, it can be quite tedious to manually copy over every single object into GameMaker. I made this tool to automate that process.
 
-See readme_en.txt for more information.
+The input file, an RMJ or Jtool map, is a text file containing a list of objects, each with an x coordinate, y coordinate, and type *number*. The output file, a GameMaker room, is an XML file where each object has an x coordinate, y coordinate, and name *string* (and other default values). The GUI lets you choose your input and output files, and also lets you map which object type numbers correspond to which object names in your GM project. It conveniently uses a file selection dialog to choose object names, so you don't have to type them out yourself.
 
-Thanks Klazen108 for the Japanese translations.
+For GameMaker 8.x projects, [Gmksplitter](https://github.com/Medo42/Gmk-Splitter) is used to decompose the binary project file to allow selection objects, and then to recompose the project file with the new room added.
 
-Download: <a href="http://fangam.es/rmj2gms" target="blank">fangam.es/rmj2gms</a> (again, thanks Klazen)
-
-![](http://i.imgur.com/LpIX2oW.png)
+![](http://i.imgur.com/GCyRLwe.png)
