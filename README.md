@@ -7,4 +7,6 @@ The input file, an RMJ or Jtool map, is a text file containing a list of objects
 
 For GameMaker 8.x projects, [Gmksplitter](https://github.com/Medo42/Gmk-Splitter) is used to decompose the binary project file to allow selection objects, and then to recompose the project file with the new room added.
 
+[Discussion on I Wanna Community forums](http://www.iwannacommunity.com/forum/index.php?topic=1744.0)
+
 ![](http://i.imgur.com/GCyRLwe.png)

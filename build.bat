@@ -1,3 +1,3 @@
-pyinstaller map2gm.py --onefile --distpath=. --windowed --icon=icon/icon.ico
+pyinstaller map2gm.py --onefile --distpath=. --icon=icon/icon.ico
 rm -r build
-rm rmj2gms.spec
+rm map2gm.spec

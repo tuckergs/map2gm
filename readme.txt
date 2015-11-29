@@ -23,6 +23,9 @@ instructions.html explains the basics of how to use the tool.
 Japanese translation done through jisho.org and translate.google.com. I know
 it is really bad, but I thought it would be better than nothing.
 
+Gmksplitter by Medo42 is included for GM 8.x support. It's on Github here:
+https://github.com/Medo42/Gmk-Splitter
+
 The source folder contains the Python 3 source code of this tool. Feel free to
 poke around and customize things, but please don't distribute your own modified
 version. Please contact me with questions about the code (I'd love to help), or
@@ -55,6 +58,9 @@ instructions.htmlは、ツールの使用方法の基本を説明しています
 
 日本語訳はjisho.orgとtranslate.google.comを介して行わ。 知っている
 それは本当に悪いですが、私はそれが何もないよりはましだろうと思いました。
+
+Medo42によってGmksplitterはGM8.xのサポートのために含まれています。ここはGithubの上にあります：
+https://github.com/Medo42/Gmk-Splitter
 
 ソースフォルダは、このツールのPythonの3のソースコードが含まれています。お気軽に
 周り突く、物事をカスタマイズするが、配布しないでください、あなた自身の修正
