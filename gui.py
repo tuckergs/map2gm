@@ -140,8 +140,7 @@ def change_language(language):
     os.execl(sys.executable, sys.executable, * sys.argv)
 
 def show_instructions():
-    instructions = {'English':'instructions_en.html','Japanese':'instructions_jp.html'}
-    os.startfile(instructions[localize.language])
+    os.startfile('instructions.html')
 
 def show_readme():
     readmes = {'English':'readme_en.txt','Japanese':'readme_jp.txt'}
