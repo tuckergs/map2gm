@@ -16,6 +16,8 @@ love notes. My skype name is patrickgh3, and my twitch channel is
 twitch.tv/patrickgh3. You can also find the forum thread for this tool at
 bit.ly/needle-map-to-gm.
 
+You can check out my other fangame tools at http://cwpat.me/iwanna-tools/
+
 
 
 --  Usage notes  --
