@@ -1,5 +1,8 @@
 title=Map to GM
 
+update_label=利用可能な新しいmap2gmのバージョンがあります。 「{version}」
+update_button=訪問のフォーラムのスレッド
+
 label_project=Project:
 label_template_room=鋳型room:
 label_map=Map:

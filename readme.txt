@@ -5,6 +5,8 @@
     | \___|   by patrickgh3
 --> |_____|
 
+  version 2.1
+
 This is a tool that automates transferring over objects from RMJ and Jtool maps
 into GameMaker. I thought that this tool would be very useful for making
 needle games, and I was in the mood to make it, so I made it.

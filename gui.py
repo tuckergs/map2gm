@@ -113,6 +113,20 @@ def entry_button_row(row, labeltext):
     button.grid(row=row,column=2,sticky=tk.W)
     return (entry, button)
 
+def show_update(newversion):
+    window = tk.Tk()
+    window.resizable(False, False)
+    window.geometry('350x150')
+    window.wm_title('')
+    label = tk.Label(window,text=loc('update_label').format(version=newversion))
+    label.grid(row=0,column=0,sticky=tk.NSEW,padx=20,pady=20)
+    def callback():
+        webbrowser.open('https://www.bit.ly/needle-map-to-gm')
+        window.destroy()
+    button = tk.Button(window, text=loc('update_button'), command=callback)
+    button.grid(row=1,column=0,sticky=tk.NSEW,padx=20,pady=20)
+    window.mainloop()
+
 def ask_language():
     global chosen
     window = tk.Tk()

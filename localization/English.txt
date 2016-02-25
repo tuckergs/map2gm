@@ -1,5 +1,8 @@
 title=Map to GM
 
+update_label=There is a new map2gm version available. ({version})
+update_button=Visit forum thread
+
 label_project=Project:
 label_template_room=Template room:
 label_map=Map:

@@ -1,6 +1,7 @@
 # entry point, input sanitization, general controller stuff
 
 import os
+import requests
 # map2gm modules
 import gui
 import convert
@@ -73,6 +74,14 @@ else:
         f.write(language)
     localize.load(language)
     gui.show_instructions()
+
+# check for update
+r = requests.get('http://cwpat.me/map2gm-version')
+if r.status_code == 200:
+    my_version = '2.2'
+    newest_version = r.json()['map2gm-version']
+    if my_version != newest_version:
+        gui.show_update(newest_version)
 
 # kick off the gui
 gui.run(submit_func=submitted)
