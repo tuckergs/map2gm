@@ -2,6 +2,7 @@
 
 import os
 import requests
+import sys
 # map2gm modules
 import gui
 import convert
@@ -76,12 +77,16 @@ else:
     gui.show_instructions()
 
 # check for update
-r = requests.get('http://cwpat.me/map2gm-version')
-if r.status_code == 200:
-    my_version = '2.1'
-    newest_version = r.json()['map2gm-version']
-    if my_version != newest_version:
-        gui.show_update(newest_version)
+try:
+    r = requests.get('http://cwpat.me/map2gm-version')
+    if r.status_code == 200:
+        my_version = '2.1'
+        newest_version = r.json()['map2gm-version']
+        if my_version != newest_version:
+            gui.show_update(newest_version)
+except Exception as e:
+    print('Error when checking for new version.')
+    print(e)
 
 # kick off the gui
 gui.run(submit_func=submitted)
