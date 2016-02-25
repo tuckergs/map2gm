@@ -59,7 +59,10 @@ def convert(project_path, template_room_path, map_path, chosen_names):
                 map_instances.append((x,y,rmj_to_objectname[id]))
     elif extension == 'jmap':
         with open(map_path) as f:
-            sections = f.readline().split('|')
+            line = f.readline()
+            if line[-1] == '\n':
+                line = line[0:-1]
+            sections = line.split('|')
         def base32string_decode(string):
             base32string = '0123456789abcdefghijklmnopqrstuv'
             result = 0
