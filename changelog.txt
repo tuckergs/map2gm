@@ -1,4 +1,4 @@
---- version 2.1   2/24/2016 ---
+--- version 2.1   2/25/2016 ---
 Should now work on Windows 8 and 10 (Compiled on Windows 10, previously was on 7)
 Check for new version on startup
 Fix bug when importing jtool 1.2.0+ maps
