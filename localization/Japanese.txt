@@ -20,6 +20,7 @@ menu_language=言葉
 menu_instructions=使用方法
 menu_readme=Readme
 menu_forum_thread=討論会
+menu_more_tools=私のツールより
 
 convert_success_gmx=保存room:%s.\nマウスクリック"Rooms"無い"Add existing room"
 convert_success_gmk=保存新しいproject:%s.

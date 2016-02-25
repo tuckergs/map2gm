@@ -20,6 +20,7 @@ menu_language=Language
 menu_instructions=Open instructions
 menu_readme=Open readme
 menu_forum_thread=Open forum thread
+menu_more_tools=More of my tools
 
 convert_success_gmx=Successfully saved room as %s.\nTo import it, right click on the Rooms folder and select "Add existing room".
 convert_success_gmk=Successfully saved new project as %s.

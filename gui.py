@@ -284,6 +284,7 @@ def run(submit_func):
     optionsmenu.add_command(label=loc('menu_instructions'), command=show_instructions)
     optionsmenu.add_command(label=loc('menu_readme'), command=show_readme)
     optionsmenu.add_command(label=loc('menu_forum_thread'), command=lambda: webbrowser.open('https://www.bit.ly/needle-map-to-gm'))
+    optionsmenu.add_command(label=loc('menu_more_tools'), command=lambda: webbrowser.open('http://cwpat.me/iwanna-tools/'))
     root.config(menu=menubar)
 
     # configure window and enter its main loop
