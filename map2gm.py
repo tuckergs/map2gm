@@ -80,7 +80,7 @@ else:
 try:
     r = requests.get('http://cwpat.me/map2gm-version')
     if r.status_code == 200:
-        my_version = '2.1'
+        my_version = '2.2'
         newest_version = r.json()['map2gm-version']
         if my_version != newest_version:
             gui.show_update(newest_version)
