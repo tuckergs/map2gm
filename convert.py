@@ -33,6 +33,8 @@ object_ids = {
     'bulletblocker':(None,19),
     'start':(3,20),
     'warp':(None,21),
+    'sideplat':(None,27),
+    'catharsis':(None,59),
     }
 
 def convert(project_path, template_room_path, map_path, chosen_names):
@@ -57,17 +59,17 @@ def convert(project_path, template_room_path, map_path, chosen_names):
             x, y, id = numbers[i:i+3]
             if id in rmj_to_objectname:
                 map_instances.append((x,y,rmj_to_objectname[id]))
-    elif extension == 'jmap':
+    elif extension == 'jmap' or extension == 'cmap':
         with open(map_path) as f:
             line = f.readline()
             if line[-1] == '\n':
                 line = line[0:-1]
             sections = line.split('|')
-        def base32string_decode(string):
-            base32string = '0123456789abcdefghijklmnopqrstuv'
+        def base64string_decode(string):
+            base64string = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
             result = 0
             for i, char in enumerate(string):
-                charvalue = base32string.index(char)
+                charvalue = base64string.index(char)
                 placevalue = math.pow(32, len(string)-i-1)
                 result += charvalue * placevalue
             return str(int(result))
@@ -76,14 +78,15 @@ def convert(project_path, template_room_path, map_path, chosen_names):
                 objectstring = section.split(':')[1]
         for ypos_section in objectstring.split('-'):
             y = ypos_section[0:2]
-            y = base32string_decode(y)
+            y = base64string_decode(y)
             y = str(int(y)-128)
             ypos_section = ypos_section[2:]
             for i in range(0, len(ypos_section), 3):
                 id = ypos_section[i]
-                id = base32string_decode(id)
+                print(id);
+                id = base64string_decode(id)
                 x = ypos_section[i+1:i+3]
-                x = base32string_decode(x)
+                x = base64string_decode(x)
                 x = str(int(x)-128)
                 if id in jtool_to_objectname:
                     map_instances.append((x,y,jtool_to_objectname[id]))

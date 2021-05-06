@@ -207,6 +207,7 @@ def run(submit_func):
         'miniblock','miniup','miniright','minileft','minidown',
         'save','platform','water1','water2','water3','cherry','hurtblock',
         'vineright','vineleft','jumprefresher','bulletblocker','start','warp',
+        'sideplat','catharsis',
         ]
     object_images = [(o,'images/%s.png'%o) for o in object_names]
     objectrowheight = 40
